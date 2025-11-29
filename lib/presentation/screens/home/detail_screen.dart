@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -190,10 +192,10 @@ class DetailScreen extends StatelessWidget {
   }
 
   void _callNumber(String number) {
-    print("Appel vers $number");
+    log("Appel vers $number");
   }
 
   void _openWhatsApp(String number) {
-    print("WhatsApp vers $number");
+    log("WhatsApp vers $number");
   }
 }
