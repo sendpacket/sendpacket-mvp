@@ -1,0 +1,60 @@
+name: SendPacket-mvp ci
+
+on:
+  pull_request:
+    branches: [ "develop", "main" ]
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Récupérer le code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Installer Flutter (version spécifique 3.38.1)
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable      # canal stable
+          flutter-version: "3.38.1"   # version exacte utilisée par ton projet
+
+      # Installer dépendances
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Analyse statique
+      - name: Static analysis
+        run: flutter analyze
+
+      # Tests unitaires
+      - name: Run unit tests
+        run: flutter test
+
+      # Build Android APK Release
+      - name: Build Android
+        run: flutter build apk --release
+
+      # Build iOS Release (sans signature)
+      - name: Build iOS
+        run: flutter build ios --release --no-codesign
+
+      # Upload artefacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sendpacket-mvp-builds
+          path: build/
+
+      # ---------------- OPTIONAL: Firebase App Distribution (désactivé pour l'instant) ----------------
+      # - name: Distribute to Firebase App Distribution
+      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
+      #   with:
+      #     appId: ${{ secrets.FIREBASE_APP_ID }}
+      #     token: ${{ secrets.FIREBASE_TOKEN }}
+      #     groups: testers
+      #     file: build/app/outputs/flutter-apk/app-release.apk
+      # ------------------------------------------------------------------------------
