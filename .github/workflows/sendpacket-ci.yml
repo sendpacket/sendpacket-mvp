@@ -40,7 +40,7 @@ jobs:
 
       # Build iOS Release (sans signature)
       - name: Build iOS
-        run: flutter build ios --release --no-codesign
+        run: flutter build ios --no-codesign --release
 
       # Upload artefacts
       - name: Upload build artifacts
