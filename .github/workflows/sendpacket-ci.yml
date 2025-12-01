@@ -38,9 +38,9 @@ jobs:
       - name: Build Android
         run: flutter build apk --release
 
-      # Build iOS Release (sans signature)
-      - name: Build iOS
-        run: flutter build ios --release
+      # Build iOS Release A faire plus tard avec XCode (sans signature)
+      #- name: Build iOS
+      #  run: flutter build ios --release
 
       # Upload artefacts
       - name: Upload build artifacts
