@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
+import 'package:flutter/foundation.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'dart:io';
+void main() async {
 
-void main() {
-  runApp(const MyApp());
+WidgetsFlutterBinding.ensureInitialized();
+if(kIsWeb) {
+await Firebase.initializeApp(options: FirebaseOptions(apiKey: "AIzaSyDF-k5CnsTjVZKyc6VrCzIGJsrCjFe0T2Y",
+                                                      authDomain: "send-packet.firebaseapp.com",
+                                                      projectId: "send-packet",
+                                                      storageBucket: "send-packet.firebasestorage.app",
+                                                      messagingSenderId: "209130586578",
+                                                      appId: "1:209130586578:web:6e24825b233cc4eef6080b" ));
+
+}
+else { await Firebase.initializeApp();}
+      runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -12,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Mon Application',
+      title: 'Send Packet',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: const Color(0xFF3A7FEA),

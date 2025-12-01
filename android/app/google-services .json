@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "209130586578",
+    "project_id": "send-packet",
+    "storage_bucket": "send-packet.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209130586578:android:515d91a69c4c7145f6080b",
+        "android_client_info": {
+          "package_name": "com.example.sendpacket"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWWbaN4m1YsKpLMl6kwpFLAtO9Q_5dl5A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
