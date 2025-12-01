@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../screens/settings/settings_screen.dart';
 
 class FloatingBottomBar extends StatelessWidget {
   final bool isDarkMode;
@@ -48,7 +49,14 @@ class FloatingBottomBar extends StatelessWidget {
                 _buildItem(
                   icon: Icons.settings,
                   label: "Paramètres",
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => SettingsScreen(isDarkMode: isDarkMode),
+                      ),
+                    );
+                  },
                   isDarkMode: isDarkMode,
                 ),
               ],
