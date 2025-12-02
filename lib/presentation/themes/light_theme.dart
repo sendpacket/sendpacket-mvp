@@ -10,7 +10,7 @@ final ThemeData lightTheme = ThemeData(
     elevation: 0.5,
     iconTheme: IconThemeData(color: Colors.black87),
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: Colors.white,
     shadowColor: Colors.grey.shade200,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -40,7 +40,7 @@ final ThemeData lightTheme = ThemeData(
     suffixIconColor: Colors.grey,
   ),
   textTheme: const TextTheme(
-    bodyText1: TextStyle(color: Colors.black87),
-    bodyText2: TextStyle(color: Colors.black87),
+    bodyLarge: TextStyle(color: Colors.black87),
+    bodyMedium: TextStyle(color: Colors.black87),
   ),
 );
