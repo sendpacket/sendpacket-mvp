@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'presentation/screens/onboarding/onboarding_screen.dart';
+import 'presentation/screens/auth/login_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -50,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
     });
   }
