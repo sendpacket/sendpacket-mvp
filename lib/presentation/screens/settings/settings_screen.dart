@@ -87,7 +87,7 @@ class SettingsScreen extends StatelessWidget {
       child: Text(
         title,
         style: TextStyle(
-          color: color.withOpacity(0.7),
+          color: color.withAlpha((0.7 * 255).toInt()),
           fontSize: 13,
           fontWeight: FontWeight.bold,
         ),
