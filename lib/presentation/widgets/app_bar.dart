@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../screens/settings/settings_screen.dart';
-
+import '../screens/auth/login_screen.dart';
 class FloatingBottomBar extends StatelessWidget {
   final bool isDarkMode;
 
@@ -43,7 +43,14 @@ class FloatingBottomBar extends StatelessWidget {
                 _buildItem(
                   icon: Icons.sell,
                   label: "Vendre",
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LoginScreen(),
+                      ),
+                    );
+                  },
                   isDarkMode: isDarkMode,
                 ),
                 _buildItem(
