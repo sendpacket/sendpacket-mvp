@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'presentation/screens/auth/login_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'presentation/screens/onboarding/onboarding_screen.dart';
