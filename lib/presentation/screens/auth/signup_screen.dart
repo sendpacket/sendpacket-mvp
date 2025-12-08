@@ -75,45 +75,31 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _validateEmail() {
     if (_email.text.isEmpty) {
-      setState(() {
-        _isEmailValid = true;
-      });
+      setState(() => _isEmailValid = true);
       return;
     }
     final regex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    setState(() {
-      _isEmailValid = regex.hasMatch(_email.text);
-    });
+    setState(() => _isEmailValid = regex.hasMatch(_email.text));
   }
 
   void _validatePassword() {
     if (_password.text.isEmpty) {
-      setState(() {
-        _isPasswordStrong = true;
-      });
+      setState(() => _isPasswordStrong = true);
       return;
     }
     final regex = RegExp(
       r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$',
     );
-    setState(() {
-      _isPasswordStrong = regex.hasMatch(_password.text);
-    });
-
+    setState(() => _isPasswordStrong = regex.hasMatch(_password.text));
     _validatePasswordsMatch();
   }
 
   void _validatePasswordsMatch() {
     if (_confirmPassword.text.isEmpty) {
-      setState(() {
-        _passwordsMatch = true;
-      });
+      setState(() => _passwordsMatch = true);
       return;
     }
-
-    setState(() {
-      _passwordsMatch = _password.text == _confirmPassword.text;
-    });
+    setState(() => _passwordsMatch = _password.text == _confirmPassword.text);
   }
 
   @override
@@ -173,7 +159,7 @@ class _SignupScreenState extends State<SignupScreen> {
               const Padding(
                 padding: EdgeInsets.only(top: 5),
                 child: Text(
-                  "Mot de passe faible (8 caractères, majuscule, minuscule, chiffre, caractère spécial)",
+                  "Mot de passe faible",
                   style: TextStyle(color: Colors.red, fontSize: 12),
                 ),
               ),
@@ -241,15 +227,17 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Future<void> _showSuccessDialog() async {
     if (!mounted) return;
+
     return showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) => AlertDialog(
         title: const Text("Succès"),
         content: const Text("Votre compte a été créé avec succès."),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(context, rootNavigator: true).pop();
               goToLogin(context);
             },
             child: const Text("OK"),
@@ -273,9 +261,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
     if (user != null) {
       log("Utilisateur créé avec succès");
-
       if (!mounted) return;
-
       _showSuccessDialog();
     }
   }
