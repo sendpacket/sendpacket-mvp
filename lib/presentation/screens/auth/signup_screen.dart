@@ -43,40 +43,56 @@ class _SignupScreenState extends State<SignupScreen> {
     super.initState();
 
     _emailFocus.addListener(() {
-      if (!_emailFocus.hasFocus) _validateEmail();
+      if (!_emailFocus.hasFocus) {
+        _validateEmail();
+      }
     });
 
     _passwordFocus.addListener(() {
-      if (!_passwordFocus.hasFocus) _validatePassword();
+      if (!_passwordFocus.hasFocus) {
+        _validatePassword();
+      }
     });
 
     _confirmPasswordFocus.addListener(() {
-      if (!_confirmPasswordFocus.hasFocus) _validatePasswordsMatch();
+      if (!_confirmPasswordFocus.hasFocus) {
+        _validatePasswordsMatch();
+      }
     });
 
     _firstName.addListener(() {
       if (_firstNameEmpty && _firstName.text.isNotEmpty) {
-        setState(() => _firstNameEmpty = false);
+        setState(() {
+          _firstNameEmpty = false;
+        });
       }
     });
     _lastName.addListener(() {
       if (_lastNameEmpty && _lastName.text.isNotEmpty) {
-        setState(() => _lastNameEmpty = false);
+        setState(() {
+          _lastNameEmpty = false;
+        });
       }
     });
     _email.addListener(() {
       if (_emailEmpty && _email.text.isNotEmpty) {
-        setState(() => _emailEmpty = false);
+        setState(() {
+          _emailEmpty = false;
+        });
       }
     });
     _password.addListener(() {
       if (_passwordEmpty && _password.text.isNotEmpty) {
-        setState(() => _passwordEmpty = false);
+        setState(() {
+          _passwordEmpty = false;
+        });
       }
     });
     _confirmPassword.addListener(() {
       if (_confirmPasswordEmpty && _confirmPassword.text.isNotEmpty) {
-        setState(() => _confirmPasswordEmpty = false);
+        setState(() {
+          _confirmPasswordEmpty = false;
+        });
       }
     });
   }
@@ -96,29 +112,41 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _validateEmail() {
     if (_email.text.isEmpty) {
-      setState(() => _isEmailValid = true);
+      setState(() {
+        _isEmailValid = true;
+      });
       return;
     }
     final regex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    setState(() => _isEmailValid = regex.hasMatch(_email.text.trim()));
+    setState(() {
+      _isEmailValid = regex.hasMatch(_email.text.trim());
+    });
   }
 
   void _validatePassword() {
     if (_password.text.isEmpty) {
-      setState(() => _isPasswordStrong = true);
+      setState(() {
+        _isPasswordStrong = true;
+      });
       return;
     }
     final regex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$');
-    setState(() => _isPasswordStrong = regex.hasMatch(_password.text));
+    setState(() {
+      _isPasswordStrong = regex.hasMatch(_password.text);
+    });
     _validatePasswordsMatch();
   }
 
   void _validatePasswordsMatch() {
     if (_confirmPassword.text.isEmpty) {
-      setState(() => _passwordsMatch = true);
+      setState(() {
+        _passwordsMatch = true;
+      });
       return;
     }
-    setState(() => _passwordsMatch = _password.text == _confirmPassword.text);
+    setState(() {
+      _passwordsMatch = _password.text == _confirmPassword.text;
+    });
   }
 
   @override
@@ -134,7 +162,6 @@ class _SignupScreenState extends State<SignupScreen> {
               style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 50),
-
             CustomTextField(
               hint: "Entrez vos prénoms",
               label: "Prénom(s)",
@@ -149,7 +176,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             const SizedBox(height: 20),
-
             CustomTextField(
               hint: "Entrez votre nom",
               label: "Nom",
@@ -164,7 +190,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             const SizedBox(height: 20),
-
             CustomTextField(
               hint: "Entrez votre Email",
               label: "Email",
@@ -189,7 +214,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             const SizedBox(height: 20),
-
             CustomTextField(
               hint: "Entrez votre Mot de passe",
               label: "Mot de passe",
@@ -197,7 +221,11 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _password,
               focusNode: _passwordFocus,
               obscureText: _obscurePassword,
-              obscureToggle: () => setState(() => _obscurePassword = !_obscurePassword),
+              obscureToggle: () {
+                setState(() {
+                  _obscurePassword = !_obscurePassword;
+                });
+              },
               onChanged: (_) => _validatePassword(),
             ),
             if (_passwordEmpty)
@@ -217,7 +245,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             const SizedBox(height: 20),
-
             CustomTextField(
               hint: "Confirmez votre Mot de passe",
               label: "Confirmation du mot de passe",
@@ -225,7 +252,11 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _confirmPassword,
               focusNode: _confirmPasswordFocus,
               obscureText: _obscureConfirmPassword,
-              obscureToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+              obscureToggle: () {
+                setState(() {
+                  _obscureConfirmPassword = !_obscureConfirmPassword;
+                });
+              },
               onChanged: (_) => _validatePasswordsMatch(),
             ),
             if (_confirmPasswordEmpty)
@@ -245,7 +276,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             const SizedBox(height: 30),
-
             CustomButton(label: "S'inscrire", onPressed: _signup),
             const SizedBox(height: 5),
             Row(
@@ -274,7 +304,9 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _showSuccessDialog() async {
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -314,7 +346,9 @@ class _SignupScreenState extends State<SignupScreen> {
         _confirmPasswordEmpty ||
         !_isEmailValid ||
         !_isPasswordStrong ||
-        !_passwordsMatch) return;
+        !_passwordsMatch) {
+      return;
+    }
 
     final user = await _auth.createUserWithEmailAndPassword(
       _email.text.trim(),
@@ -323,7 +357,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
     if (user != null) {
       log("Utilisateur créé avec succès");
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       _showSuccessDialog();
     }
   }
