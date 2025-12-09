@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../screens/auth/login_screen.dart';
+import '../../screens/verification/verify_identity_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final bool isDarkMode;
@@ -40,7 +41,14 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.verified_user,
             label: "Vérifier mon compte",
             textColor: textColor,
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => VerifyIdentityScreen(isDarkMode: isDarkMode),
+                ),
+              );
+            },
           ),
           _buildMenuItem(
             icon: Icons.logout,
