@@ -41,58 +41,38 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   void initState() {
     super.initState();
-
     _emailFocus.addListener(() {
-      if (!_emailFocus.hasFocus) {
-        _validateEmail();
-      }
+      if (!_emailFocus.hasFocus) _validateEmail();
     });
-
     _passwordFocus.addListener(() {
-      if (!_passwordFocus.hasFocus) {
-        _validatePassword();
-      }
+      if (!_passwordFocus.hasFocus) _validatePassword();
     });
-
     _confirmPasswordFocus.addListener(() {
-      if (!_confirmPasswordFocus.hasFocus) {
-        _validatePasswordsMatch();
-      }
+      if (!_confirmPasswordFocus.hasFocus) _validatePasswordsMatch();
     });
-
     _firstName.addListener(() {
       if (_firstNameEmpty && _firstName.text.isNotEmpty) {
-        setState(() {
-          _firstNameEmpty = false;
-        });
+        setState(() => _firstNameEmpty = false);
       }
     });
     _lastName.addListener(() {
       if (_lastNameEmpty && _lastName.text.isNotEmpty) {
-        setState(() {
-          _lastNameEmpty = false;
-        });
+        setState(() => _lastNameEmpty = false);
       }
     });
     _email.addListener(() {
       if (_emailEmpty && _email.text.isNotEmpty) {
-        setState(() {
-          _emailEmpty = false;
-        });
+        setState(() => _emailEmpty = false);
       }
     });
     _password.addListener(() {
       if (_passwordEmpty && _password.text.isNotEmpty) {
-        setState(() {
-          _passwordEmpty = false;
-        });
+        setState(() => _passwordEmpty = false);
       }
     });
     _confirmPassword.addListener(() {
       if (_confirmPasswordEmpty && _confirmPassword.text.isNotEmpty) {
-        setState(() {
-          _confirmPasswordEmpty = false;
-        });
+        setState(() => _confirmPasswordEmpty = false);
       }
     });
   }
@@ -112,41 +92,29 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _validateEmail() {
     if (_email.text.isEmpty) {
-      setState(() {
-        _isEmailValid = true;
-      });
+      setState(() => _isEmailValid = true);
       return;
     }
     final regex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    setState(() {
-      _isEmailValid = regex.hasMatch(_email.text.trim());
-    });
+    setState(() => _isEmailValid = regex.hasMatch(_email.text.trim()));
   }
 
   void _validatePassword() {
     if (_password.text.isEmpty) {
-      setState(() {
-        _isPasswordStrong = true;
-      });
+      setState(() => _isPasswordStrong = true);
       return;
     }
     final regex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$');
-    setState(() {
-      _isPasswordStrong = regex.hasMatch(_password.text);
-    });
+    setState(() => _isPasswordStrong = regex.hasMatch(_password.text));
     _validatePasswordsMatch();
   }
 
   void _validatePasswordsMatch() {
     if (_confirmPassword.text.isEmpty) {
-      setState(() {
-        _passwordsMatch = true;
-      });
+      setState(() => _passwordsMatch = true);
       return;
     }
-    setState(() {
-      _passwordsMatch = _password.text == _confirmPassword.text;
-    });
+    setState(() => _passwordsMatch = _password.text == _confirmPassword.text);
   }
 
   @override
@@ -157,38 +125,19 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Column(
           children: [
             const Spacer(),
-            const Text(
-              "S'inscrire",
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
-            ),
+            const Text("S'inscrire", style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500)),
             const SizedBox(height: 50),
-            CustomTextField(
-              hint: "Entrez vos prénoms",
-              label: "Prénom(s)",
-              controller: _firstName,
+            CustomTextField(hint: "Entrez vos prénoms", label: "Prénom(s)", controller: _firstName),
+            if (_firstNameEmpty) const Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: Text("Le prénom est requis", style: TextStyle(color: Colors.red, fontSize: 12)),
             ),
-            if (_firstNameEmpty)
-              const Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: Text(
-                  "Le prénom est requis",
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
             const SizedBox(height: 20),
-            CustomTextField(
-              hint: "Entrez votre nom",
-              label: "Nom",
-              controller: _lastName,
+            CustomTextField(hint: "Entrez votre nom", label: "Nom", controller: _lastName),
+            if (_lastNameEmpty) const Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: Text("Le nom est requis", style: TextStyle(color: Colors.red, fontSize: 12)),
             ),
-            if (_lastNameEmpty)
-              const Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: Text(
-                  "Le nom est requis",
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
             const SizedBox(height: 20),
             CustomTextField(
               hint: "Entrez votre Email",
@@ -197,22 +146,14 @@ class _SignupScreenState extends State<SignupScreen> {
               focusNode: _emailFocus,
               onChanged: (_) => _validateEmail(),
             ),
-            if (_emailEmpty)
-              const Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: Text(
-                  "L'email est requis",
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
-            if (!_isEmailValid)
-              const Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: Text(
-                  "Format d’email invalide",
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
+            if (_emailEmpty) const Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: Text("L'email est requis", style: TextStyle(color: Colors.red, fontSize: 12)),
+            ),
+            if (!_isEmailValid) const Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: Text("Format d’email invalide", style: TextStyle(color: Colors.red, fontSize: 12)),
+            ),
             const SizedBox(height: 20),
             CustomTextField(
               hint: "Entrez votre Mot de passe",
@@ -221,29 +162,17 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _password,
               focusNode: _passwordFocus,
               obscureText: _obscurePassword,
-              obscureToggle: () {
-                setState(() {
-                  _obscurePassword = !_obscurePassword;
-                });
-              },
+              obscureToggle: () => setState(() => _obscurePassword = !_obscurePassword),
               onChanged: (_) => _validatePassword(),
             ),
-            if (_passwordEmpty)
-              const Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: Text(
-                  "Le mot de passe est requis",
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
-            if (!_isPasswordStrong)
-              const Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: Text(
-                  "8 caractères min, majuscule, minuscule, chiffre et symbole",
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
+            if (_passwordEmpty) const Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: Text("Le mot de passe est requis", style: TextStyle(color: Colors.red, fontSize: 12)),
+            ),
+            if (!_isPasswordStrong) const Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: Text("8 caractères min, majuscule, minuscule, chiffre et symbole", style: TextStyle(color: Colors.red, fontSize: 12)),
+            ),
             const SizedBox(height: 20),
             CustomTextField(
               hint: "Confirmez votre Mot de passe",
@@ -252,29 +181,17 @@ class _SignupScreenState extends State<SignupScreen> {
               controller: _confirmPassword,
               focusNode: _confirmPasswordFocus,
               obscureText: _obscureConfirmPassword,
-              obscureToggle: () {
-                setState(() {
-                  _obscureConfirmPassword = !_obscureConfirmPassword;
-                });
-              },
+              obscureToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
               onChanged: (_) => _validatePasswordsMatch(),
             ),
-            if (_confirmPasswordEmpty)
-              const Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: Text(
-                  "La confirmation du mot de passe est requise",
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
-            if (!_passwordsMatch)
-              const Padding(
-                padding: EdgeInsets.only(top: 5),
-                child: Text(
-                  "Les mots de passe ne correspondent pas",
-                  style: TextStyle(color: Colors.red, fontSize: 12),
-                ),
-              ),
+            if (_confirmPasswordEmpty) const Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: Text("La confirmation du mot de passe est requise", style: TextStyle(color: Colors.red, fontSize: 12)),
+            ),
+            if (!_passwordsMatch) const Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: Text("Les mots de passe ne correspondent pas", style: TextStyle(color: Colors.red, fontSize: 12)),
+            ),
             const SizedBox(height: 30),
             CustomButton(label: "S'inscrire", onPressed: _signup),
             const SizedBox(height: 5),
@@ -282,10 +199,7 @@ class _SignupScreenState extends State<SignupScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text("Vous avez déjà un compte ? "),
-                InkWell(
-                  onTap: () => goToLogin(context),
-                  child: const Text("Connexion", style: TextStyle(color: Colors.red)),
-                ),
+                InkWell(onTap: () => goToLogin(context), child: const Text("Connexion", style: TextStyle(color: Colors.red))),
               ],
             ),
             const Spacer(),
@@ -304,9 +218,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _showSuccessDialog() async {
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
     await showDialog(
       context: context,
       barrierDismissible: false,
@@ -339,27 +251,17 @@ class _SignupScreenState extends State<SignupScreen> {
     _validatePassword();
     _validatePasswordsMatch();
 
-    if (_firstNameEmpty ||
-        _lastNameEmpty ||
-        _emailEmpty ||
-        _passwordEmpty ||
-        _confirmPasswordEmpty ||
-        !_isEmailValid ||
-        !_isPasswordStrong ||
-        !_passwordsMatch) {
-      return;
-    }
+    if (_firstNameEmpty || _lastNameEmpty || _emailEmpty || _passwordEmpty || _confirmPasswordEmpty || !_isEmailValid || !_isPasswordStrong || !_passwordsMatch) return;
 
     final user = await _auth.createUserWithEmailAndPassword(
       _email.text.trim(),
       _password.text.trim(),
+      firstName: _firstName.text.trim(),
+      lastName: _lastName.text.trim(),
     );
 
-    if (user != null) {
+    if (user != null && mounted) {
       log("Utilisateur créé avec succès");
-      if (!mounted) {
-        return;
-      }
       _showSuccessDialog();
     }
   }
