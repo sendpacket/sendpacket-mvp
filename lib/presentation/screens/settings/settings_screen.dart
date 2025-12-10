@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/verification/verify_identity_screen.dart';
+import '../../screens/home/home_screen.dart';
+
 
 class SettingsScreen extends StatelessWidget {
   final bool isDarkMode;
@@ -214,7 +216,7 @@ class SettingsScreen extends StatelessWidget {
                           Navigator.of(context, rootNavigator: true).pop();
                           Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(builder: (_) => const LoginScreen()),
+                            MaterialPageRoute(builder: (_) => const HomeScreen()),
                                 (route) => false,
                           );
                         },

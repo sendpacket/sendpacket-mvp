@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -70,9 +68,9 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.4),
+      barrierColor: Colors.black.withValues(alpha: 0.4),
       transitionDuration: const Duration(milliseconds: 280),
-      pageBuilder: (_, __, ___) {
+      pageBuilder: (_, _, _) {
         return Container();
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
@@ -96,13 +94,13 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.07)
-                            : Colors.white.withOpacity(0.85),
+                            ? Colors.white.withValues(alpha:0.07)
+                            : Colors.white.withValues(alpha:0.85),
                         borderRadius: BorderRadius.circular(26),
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withOpacity(0.15)
-                              : Colors.black.withOpacity(0.05),
+                              ? Colors.white.withValues(alpha:0.15)
+                              : Colors.black.withValues(alpha:0.05),
                         ),
                       ),
                       child: Column(
@@ -194,7 +192,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha:0.2),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -276,8 +274,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.4)
-                : Colors.grey.withOpacity(0.15),
+                ? Colors.black.withValues(alpha:0.4)
+                : Colors.grey.withValues(alpha:0.15),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -446,7 +444,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha:0.1),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -563,8 +561,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.5)
-                : Colors.grey.withOpacity(0.15),
+                ? Colors.black.withValues(alpha:0.5)
+                : Colors.grey.withValues(alpha:0.15),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -575,7 +573,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.blueAccent.withOpacity(0.20),
+            color: Colors.blueAccent.withValues(alpha:0.20),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: Colors.blueAccent),
@@ -763,8 +761,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withOpacity(0.5)
-                  : Colors.grey.withOpacity(0.15),
+                  ? Colors.black.withValues(alpha:0.5)
+                  : Colors.grey.withValues(alpha:0.15),
               blurRadius: 7,
               offset: const Offset(0, 3),
             ),
@@ -820,7 +818,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.4 : 0.1),
+                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1,),
                 blurRadius: 25,
                 spreadRadius: 5,
                 offset: const Offset(0, -3),
@@ -854,7 +852,6 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
               const SizedBox(height: 12),
 
-              // --- Options stylées
               ...docs.entries.map((e) {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 10),
@@ -868,7 +865,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                     leading: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.blueAccent.withOpacity(0.15),
+                        color: Colors.blueAccent.withValues(alpha:0.15),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -894,7 +891,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                     },
                   ),
                 );
-              }).toList(),
+              }),
 
               const SizedBox(height: 15),
             ],
@@ -923,14 +920,14 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: dark
-                        ? Colors.black.withOpacity(0.55)
-                        : Colors.white.withOpacity(0.85),
+                        ? Colors.black.withValues(alpha:0.55)
+                        : Colors.white.withValues(alpha:0.85),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
                         color: dark
-                            ? Colors.black.withOpacity(0.6)
-                            : Colors.black.withOpacity(0.15),
+                            ? Colors.black.withValues(alpha:0.6)
+                            : Colors.black.withValues(alpha:0.15),
                         blurRadius: 25,
                         offset: const Offset(0, 10),
                       ),
@@ -1049,6 +1046,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         "submittedAt": FieldValue.serverTimestamp(),
       });
 
+      if (!mounted) return;
+
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -1064,7 +1063,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.25),
+                      color: Colors.black.withValues(alpha:0.25),
                       blurRadius: 25,
                       offset: const Offset(0, 12),
                     ),
@@ -1179,8 +1178,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withOpacity(0.5)
-                : Colors.grey.withOpacity(0.15),
+                ? Colors.black.withValues(alpha:0.5)
+                : Colors.grey.withValues(alpha:0.15),
             blurRadius: 7,
             offset: const Offset(0, 3),
           ),
@@ -1191,7 +1190,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.blueAccent.withOpacity(0.15),
+            color: Colors.blueAccent.withValues(alpha:0.15),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -1332,7 +1331,7 @@ class _KycInstructionPageState extends State<KycInstructionPage> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.blueAccent.withOpacity(0.25)
+                            ? Colors.blueAccent.withValues(alpha:0.25)
                             : const Color(0xFFE3F0FF),
                         shape: BoxShape.circle,
                       ),
