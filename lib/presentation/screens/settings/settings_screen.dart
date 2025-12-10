@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/verification/verify_identity_screen.dart';
 
@@ -10,6 +11,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textColor = isDarkMode ? Colors.white : Colors.black;
+    final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
       backgroundColor: isDarkMode ? Colors.black : Colors.white,
@@ -25,38 +27,71 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         children: [
           _buildSectionTitle("Compte", textColor),
-          _buildMenuItem(
-            icon: Icons.person,
-            label: "Modifier mon profil",
-            textColor: textColor,
-            onTap: () {},
-          ),
-          _buildMenuItem(
-            icon: Icons.assignment,
-            label: "Mes annonces",
-            textColor: textColor,
-            onTap: () {},
-          ),
-          _buildMenuItem(
-            icon: Icons.verified_user,
-            label: "Vérifier mon compte",
-            textColor: textColor,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => VerifyIdentityScreen(isDarkMode: isDarkMode),
-                ),
-              );
-            },
-          ),
-          _buildMenuItem(
-            icon: Icons.logout,
-            label: "Se déconnecter",
-            textColor: textColor,
-            onTap: () => _showLogoutDialog(context),
-          ),
+
+          // --------------------------
+          // Visible SEULEMENT si connecté
+          // --------------------------
+          if (user != null)
+            _buildMenuItem(
+              icon: Icons.person,
+              label: "Modifier mon profil",
+              textColor: textColor,
+              onTap: () {},
+            ),
+
+          if (user != null)
+            _buildMenuItem(
+              icon: Icons.assignment,
+              label: "Mes annonces",
+              textColor: textColor,
+              onTap: () {},
+            ),
+
+          if (user != null)
+            _buildMenuItem(
+              icon: Icons.verified_user,
+              label: "Vérifier mon compte",
+              textColor: textColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => VerifyIdentityScreen(isDarkMode: isDarkMode),
+                  ),
+                );
+              },
+            ),
+
+          // --------------------------
+          // Visible SEULEMENT si NON connecté
+          // --------------------------
+          if (user == null)
+            _buildMenuItem(
+              icon: Icons.login,
+              label: "Se connecter",
+              textColor: textColor,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                );
+              },
+            ),
+
+          // --------------------------
+          // Déconnexion — visible seulement si connecté
+          // --------------------------
+          if (user != null)
+            _buildMenuItem(
+              icon: Icons.logout,
+              label: "Se déconnecter",
+              textColor: textColor,
+              onTap: () => _showLogoutDialog(context),
+            ),
+
           const SizedBox(height: 20),
+
+          // ------------------------------------------------------------------
           _buildSectionTitle("Application", textColor),
           _buildMenuItem(
             icon: Icons.lock,
@@ -76,6 +111,7 @@ class SettingsScreen extends StatelessWidget {
             textColor: textColor,
             onTap: () {},
           ),
+
           const SizedBox(height: 20),
           _buildSectionTitle("Support", textColor),
           _buildMenuItem(
