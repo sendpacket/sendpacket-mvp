@@ -2,9 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../screens/settings/settings_screen.dart';
-
-const Color kPrimaryBlue = Color(0xFF3A7FEA);
-
+import '../screens/auth/login_screen.dart';
 class FloatingBottomBar extends StatelessWidget {
   final bool isDarkMode;
   final bool isAuthenticated;
@@ -53,9 +51,17 @@ class FloatingBottomBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _BottomItem(
-                  icon: Icons.favorite_border,
-                  label: "Favoris",
+                _buildItem(
+                  icon: Icons.sell,
+                  label: "Vendre",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => LoginScreen(),
+                      ),
+                    );
+                  },
                   isDarkMode: isDarkMode,
                   onTap: () {
                     // plus tard: page Favoris
