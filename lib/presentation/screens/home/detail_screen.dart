@@ -14,7 +14,7 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Debug console
-    print('ITEM DÉTAIL = $item');
+   // print('ITEM DÉTAIL = $item');
 
     // Lecture des champs "plats"
     final String departCity = (item['depart_city'] ?? '') as String;

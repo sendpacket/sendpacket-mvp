@@ -16,7 +16,8 @@ class FloatingBottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color bg = isDarkMode
         ? const Color(0xCC0B1220)
-        : Colors.white.withOpacity(0.95);
+        : Colors.white.withValues(alpha: 0.95);
+
     final Color iconColor = isDarkMode ? Colors.white : Colors.black87;
     final Color textColor =
     isDarkMode ? Colors.white70 : Colors.grey[700]!;
@@ -31,7 +32,7 @@ class FloatingBottomBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.35),
+              color: Colors.black.withValues(alpha: 0.35), // FIXED
               blurRadius: 30,
               offset: const Offset(0, 18),
             ),
@@ -46,8 +47,7 @@ class FloatingBottomBar extends StatelessWidget {
               iconColor: iconColor,
               textColor: textColor,
               onTap: () {
-                // TODO: écran favoris plus tard
-                // Navigator.pushNamed(context, '/favorites');
+                // TODO: favoris page
               },
             ),
             const Spacer(),
@@ -60,7 +60,6 @@ class FloatingBottomBar extends StatelessWidget {
               iconColor: iconColor,
               textColor: textColor,
               onTap: () {
-                // écran settings / profil
                 Navigator.pushNamed(context, '/settings');
               },
             ),
@@ -123,7 +122,7 @@ class FloatingBottomBar extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: kPrimaryBlue.withOpacity(0.55),
+              color: kPrimaryBlue.withValues(alpha: 0.55), // FIXED
               blurRadius: 24,
               offset: const Offset(0, 10),
             ),
