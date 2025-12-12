@@ -18,6 +18,7 @@ class CreateAnnouncementScreen extends StatefulWidget {
 class _CreateAnnouncementScreenState
     extends State<CreateAnnouncementScreen> {
   int _currentStep = 0;
+  bool _hasStarted = false;
   bool _isSubmitting = false;
 
   // -------- TRAJET --------
@@ -191,8 +192,8 @@ class _CreateAnnouncementScreenState
           .get();
 
       if (existing.docs.length >= 3) {
-        Navigator.pop(context);
-        await _showLimitDialog();
+        Navigator.of(context, rootNavigator: true).pop(); // ferme loader
+        await _showLimitBottomSheet();
         return;
       }
 
@@ -262,29 +263,7 @@ class _CreateAnnouncementScreenState
     }
   }
 
-  Future<void> _showLimitDialog() async {
-    await showDialog(
-      context: context,
-      builder: (dialogContext) {   // <--- ICI on crée dialogContext
-        return AlertDialog(
-          title: const Text("Limite atteinte"),
-          content: const Text(
-            "Vous ne pouvez publier que 3 annonces simultanément. "
-                "Supprimez une annonce existante pour en créer une nouvelle.",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext, rootNavigator: true).pop();
-              },
-              child: const Text("OK"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
+  //Message ajout reussi
   Future<void> _showSuccessSheet() async {
     await showModalBottomSheet(
       context: context,
@@ -321,6 +300,147 @@ class _CreateAnnouncementScreenState
     );
   }
 
+// Limites de 3 annonces atteint
+  Future<void> _showLimitBottomSheet() async {
+    await showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.warning_amber_rounded,
+                color: Colors.orange, size: 64),
+            const SizedBox(height: 12),
+            const Text(
+              "Limite atteinte",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Vous avez déjà 3 annonces actives.\n"
+                  "Veuillez supprimer une annonce existante avant d’en publier une nouvelle.",
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                child: const Text("Retour à la liste"),
+                onPressed: () {
+                  Navigator.pop(context); // ferme bottom sheet
+                  Navigator.pop(context); // retour HomeScreen
+                },
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _introPage() {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+
+          const Text(
+            "Avant de publier une annonce",
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          ),
+
+          const SizedBox(height: 12),
+
+          const Text(
+            "Pour garantir votre sécurité et celle des autres utilisateurs, "
+                "merci de prendre connaissance des recommandations suivantes :",
+            style: TextStyle(fontSize: 15),
+          ),
+
+          const SizedBox(height: 24),
+
+          _adviceItem(
+            "Inspectez soigneusement les colis",
+            "Assurez-vous qu’ils ne contiennent aucun objet interdit "
+                "(substances illicites, armes, objets dangereux, etc.).",
+          ),
+
+          _adviceItem(
+            "Planifiez la livraison à l’avance",
+            "Convenez clairement avec le client des modalités de réception "
+                "et des personnes à contacter à l’arrivée.",
+          ),
+
+          _adviceItem(
+            "Privilégiez un lieu public",
+            "Fixez les rencontres dans des lieux publics et fréquentés "
+                "pour plus de sécurité.",
+          ),
+
+          const Spacer(),
+
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => setState(() => _hasStarted = true),
+              child: const Text("Commencer"),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _adviceItem(String title, String description) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.check_circle,
+            color: colorScheme.primary,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface.withOpacity(0.85),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
   // ========= UI =========
 
   @override
@@ -329,14 +449,16 @@ class _CreateAnnouncementScreenState
       appBar: AppBar(
         title: const Text("Créer une annonce"),
       ),
-      body: Column(
+      body: _hasStarted
+          ? Column(
         children: [
           _stepIndicator(),
           const Divider(height: 1),
           Expanded(child: _stepBody()),
           _bottomButtons(),
         ],
-      ),
+      )
+          : _introPage(),
     );
   }
 
