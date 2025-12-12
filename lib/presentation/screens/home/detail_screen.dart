@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 class DetailScreen extends StatelessWidget {
@@ -14,21 +13,44 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String departureParts = item["departure_time"];
-    String arrivalParts = item["arrival_time"];
-    String departureTime = departureParts.split(" ")[0];
-    String departureDate = departureParts.split(" ").sublist(1).join(" ");
-    String arrivalTime = arrivalParts.split(" ")[0];
-    String arrivalDate = arrivalParts.split(" ").sublist(1).join(" ");
+    // Lecture des champs "plats"
+    final String departCity = (item['depart_city'] ?? '') as String;
+    final String departCountry =
+    (item['depart_country'] ?? '') as String;
+    final String destinationCity =
+    (item['destination_city'] ?? '') as String;
+    final String destinationCountry =
+    (item['destination_country'] ?? '') as String;
+    final String weight = (item['weight'] ?? '') as String;
 
-    // Infos supplémentaires
-    String lastBookingDate = "22 Janvier 2024";
-    String collectionAddress = "145 Boulevard Deguire, Mtl";
-    String deliveryAddress = "3051 Liberté 6, Dakar";
+    // les champs pour les dates (labels déjà formatés)
+    final String departureDate =
+    (item['departure_date_label'] ?? '') as String;
+    final String arrivalDate =
+    (item['arrival_date_label'] ?? '') as String;
 
-    Color backgroundColor = isDarkMode ? Colors.black : Colors.white;
-    Color textColor = isDarkMode ? Colors.white : Colors.black87;
-    Color subTextColor = isDarkMode ? Colors.white70 : Colors.grey[800]!;
+    // nom & prix : déjà préparés côté HomeScreen (avec fallback)
+    final String carrierName = (item['carrier_name'] ?? '') as String;
+    final String carrierImage = (item['carrier_image'] ?? '') as String;
+    final String price = (item['price'] ?? '') as String;
+
+    // Données "brutes" venant directement de Firestore
+    final Map<String, dynamic> raw =
+    (item['raw_data'] ?? <String, dynamic>{}) as Map<String, dynamic>;
+
+    final String lastBookingDate = (raw['expiresAt'] ?? '') as String;
+    final String description = (raw['description'] ?? '') as String;
+
+    // Téléphone & WhatsApp
+    final String phone =
+    (item['raw_numero_tel'] ?? raw['numeroTel'] ?? '').toString();
+    final bool hasWhatsApp = (raw['whatsapp'] ?? false) == true;
+
+    // Couleurs selon thème
+    final Color backgroundColor = isDarkMode ? Colors.black : Colors.white;
+    final Color textColor = isDarkMode ? Colors.white : Colors.black87;
+    final Color subTextColor =
+    isDarkMode ? Colors.white70 : (Colors.grey[800]!);
 
     Widget infoRow(IconData icon, String title, String subtitle) {
       return Padding(
@@ -42,9 +64,22 @@ class DetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(color: subTextColor, fontSize: 15)),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: subTextColor,
+                      fontSize: 15,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -58,7 +93,10 @@ class DetailScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: backgroundColor,
         iconTheme: IconThemeData(color: textColor),
-        title: Text("Détails", style: TextStyle(color: textColor)),
+        title: Text(
+          "Détails",
+          style: TextStyle(color: textColor),
+        ),
         elevation: 0.5,
       ),
       body: Padding(
@@ -73,12 +111,18 @@ class DetailScreen extends StatelessWidget {
                     // Villes
                     Row(
                       children: [
-                        Icon(Icons.location_on, color: Colors.redAccent, size: 28),
+                        Icon(Icons.location_on,
+                            color: Colors.redAccent, size: 28),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            "${item["depart_city"]} (${item["depart_country"]}) → ${item["destination_city"]} (${item["destination_country"]})",
-                            style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 22),
+                            "$departCity ($departCountry) → "
+                                "$destinationCity ($destinationCountry)",
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
                           ),
                         ),
                       ],
@@ -86,19 +130,42 @@ class DetailScreen extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // Départ
-                    infoRow(Icons.airplanemode_active, "Départ", "Heure: $departureTime\nDate: $departureDate"),
+                    infoRow(
+                      Icons.airplanemode_active,
+                      "Départ",
+                      "Date : $departureDate",
+                    ),
 
                     // Arrivée
-                    infoRow(Icons.flag, "Arrivée", "Heure: $arrivalTime\nDate: $arrivalDate"),
+                    infoRow(
+                      Icons.flag,
+                      "Arrivée",
+                      "Date : $arrivalDate",
+                    ),
 
-                    // Dernier délai réservation
-                    infoRow(Icons.timer, "Dernier délai de réservation", lastBookingDate),
+                    // Dernier délai réservation (à partir de expiresAt)
+                    if (lastBookingDate.isNotEmpty)
+                      infoRow(
+                        Icons.timer,
+                        "Dernier délai de réservation",
+                        lastBookingDate,
+                      ),
 
-                    // Adresse collecte
-                    infoRow(Icons.home_work, "Adresse de collecte", collectionAddress),
+                    // Poids disponible
+                    if (weight.isNotEmpty)
+                      infoRow(
+                        Icons.line_weight,
+                        "Poids disponible",
+                        weight,
+                      ),
 
-                    // Adresse livraison
-                    infoRow(Icons.location_city, "Adresse de réception", deliveryAddress),
+                    // Description
+                    if (description.isNotEmpty)
+                      infoRow(
+                        Icons.description_outlined,
+                        "Description",
+                        description,
+                      ),
 
                     const SizedBox(height: 24),
 
@@ -107,18 +174,26 @@ class DetailScreen extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 26,
-                          backgroundImage: AssetImage(item["carrier_image"]),
+                          backgroundImage: AssetImage(carrierImage),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            item["carrier_name"],
-                            style: TextStyle(color: textColor, fontWeight: FontWeight.w600, fontSize: 18),
+                            carrierName,
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                            ),
                           ),
                         ),
                         Text(
-                          item["price"],
-                          style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 18),
+                          price,
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
                       ],
                     ),
@@ -135,12 +210,27 @@ class DetailScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF3A7FEA),
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
                 onPressed: () {
+                  if (phone.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Numéro du transporteur non disponible.",
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
                   showModalBottomSheet(
                     context: context,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                     builder: (context) => Padding(
                       padding: const EdgeInsets.all(24),
                       child: Column(
@@ -148,32 +238,44 @@ class DetailScreen extends StatelessWidget {
                         children: [
                           const Text(
                             "Contacter le transporteur",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
                           ),
                           const SizedBox(height: 20),
+
+                          // Appel
                           ElevatedButton.icon(
-                            onPressed: () => _callNumber("+15145551234"),
+                            onPressed: () => _callNumber(phone),
                             icon: const Icon(Icons.phone),
                             label: const Text("Appeler"),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
                               minimumSize: const Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
                           ),
                           const SizedBox(height: 12),
-                          ElevatedButton.icon(
-                            onPressed: () => _openWhatsApp("15145551234"),
-                            icon: const Icon(Icons.chat_bubble_outline),
-                            label: const Text("WhatsApp"),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF25D366),
-                              foregroundColor: Colors.white,
-                              minimumSize: const Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+
+                          // WhatsApp (affiché seulement si whatsapp == true)
+                          if (hasWhatsApp)
+                            ElevatedButton.icon(
+                              onPressed: () => _openWhatsApp(phone),
+                              icon: const Icon(Icons.chat_bubble_outline),
+                              label: const Text("WhatsApp"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF25D366),
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 50),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -181,7 +283,10 @@ class DetailScreen extends StatelessWidget {
                 },
                 child: const Text(
                   "Contacter le transporteur",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -193,9 +298,11 @@ class DetailScreen extends StatelessWidget {
 
   void _callNumber(String number) {
     log("Appel vers $number");
+    // TODO: intégrer url_launcher plus tard un vrai appel
   }
 
   void _openWhatsApp(String number) {
     log("WhatsApp vers $number");
+    // TODO: intégrer url_launcher avec wa.me plutard
   }
 }
