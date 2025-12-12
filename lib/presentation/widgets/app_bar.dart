@@ -1,4 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+
+import '../screens/settings/settings_screen.dart';
+import '../screens/auth/login_screen.dart';
 
 const Color kPrimaryBlue = Color(0xFF3A7FEA);
 
@@ -32,7 +36,7 @@ class FloatingBottomBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.35), // FIXED
+              color: Colors.black.withValues(alpha: 0.35),
               blurRadius: 30,
               offset: const Offset(0, 18),
             ),
@@ -60,7 +64,15 @@ class FloatingBottomBar extends StatelessWidget {
               iconColor: iconColor,
               textColor: textColor,
               onTap: () {
-                Navigator.pushNamed(context, '/settings');
+                // Ouverture directe de l'écran de paramètres
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SettingsScreen(
+                      isDarkMode: isDarkMode,
+                    ),
+                  ),
+                );
               },
             ),
           ],
@@ -102,9 +114,11 @@ class FloatingBottomBar extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (!isAuthenticated) {
+          // Route nommée déjà existante pour le login
           Navigator.pushNamed(context, '/login');
           return;
         }
+
         Navigator.pushNamed(context, '/create-annonce');
       },
       child: Container(
@@ -122,7 +136,7 @@ class FloatingBottomBar extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: kPrimaryBlue.withValues(alpha: 0.55), // FIXED
+              color: kPrimaryBlue.withValues(alpha: 0.55),
               blurRadius: 24,
               offset: const Offset(0, 10),
             ),

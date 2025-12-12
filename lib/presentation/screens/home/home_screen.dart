@@ -79,8 +79,38 @@ class _HomeScreenState extends State<HomeScreen> {
     final String arrivalDateLabel = _formatDate(voyageDate);
     final String expiresAtLabel = _formatDate(expiresAt);
 
-    // prix temporaire (en attendant un vrai champ en DB)
-    const String tempPrice = '17\$/kg';
+    // -------- Nouveau : nom/prénom + prix + placeholders --------
+    final String ownerFirstName =
+    (data['ownerFirstName'] ?? '').toString().trim();
+    final String ownerLastName =
+    (data['ownerLastName'] ?? '').toString().trim();
+    final String description =
+    (data['description'] ?? '').toString().trim();
+
+    String carrierName;
+    if (ownerFirstName.isNotEmpty || ownerLastName.isNotEmpty) {
+      // "prenom nom" (gère aussi si un seul des deux est présent)
+      carrierName = ('$ownerFirstName $ownerLastName').trim();
+    } else if (description.isNotEmpty) {
+      // fallback : description des anciennes annonces
+      carrierName = description;
+    } else {
+      carrierName = 'Transporteur';
+    }
+
+    // Prix : utiliser le champ Firestore s'il existe, sinon 17$/kg
+    String priceLabel = '17\$/kg';
+    final dynamic rawPrice = data['price'];
+    if (rawPrice != null) {
+      final num? parsed = num.tryParse(rawPrice.toString());
+      if (parsed != null) {
+        if (parsed % 1 == 0) {
+          priceLabel = '${parsed.toInt()}\$/kg';
+        } else {
+          priceLabel = '${parsed.toStringAsFixed(1)}\$/kg';
+        }
+      }
+    }
 
     final String numeroTel = (data['numeroTel'] ?? '').toString();
 
@@ -96,9 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
       'departure_date_label': departureDateLabel,
       'arrival_date_label': arrivalDateLabel,
       'expires_at_label': expiresAtLabel,
-      'carrier_name': (data['description'] ?? 'Transporteur').toString(),
+      'carrier_name': carrierName,
       'carrier_image': 'assets/img/avatar1.jpg',
-      'price': tempPrice,
+      'price': priceLabel,
       'raw_numero_tel': numeroTel,
       'raw_data': data,
     };
@@ -364,153 +394,141 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Ligne 1 : icônes partage / favoris
-              // Ligne 2 : pays + villes
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              // Icônes en haut à droite
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Icônes en haut à droite
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.ios_share_outlined,
-                          color: secondaryText,
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          // sera branché plus tard (Share.plus)
-                        },
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      const SizedBox(width: 6),
-                      IconButton(
-                        icon: Icon(
-                          Icons.favorite_border,
-                          color: secondaryText,
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          // sera branché plus tard (favoris Firestore)
-                        },
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
+                  IconButton(
+                    icon: Icon(
+                      Icons.ios_share_outlined,
+                      color: secondaryText,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      // sera branché plus tard (Share.plus)
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
-
-                  const SizedBox(height: 4),
-
-                  // Pays + villes
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Départ
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item['depart_country'] ?? '',
-                              style: const TextStyle(
-                                color: kPrimaryBlue,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              item['depart_city'] ?? '',
-                              style: TextStyle(
-                                color: secondaryText,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Destination
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              item['destination_country'] ?? '',
-                              textAlign: TextAlign.right,
-                              style: const TextStyle(
-                                color: kPrimaryBlue,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              item['destination_city'] ?? '',
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                color: secondaryText,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  const SizedBox(width: 6),
+                  IconButton(
+                    icon: Icon(
+                      Icons.favorite_border,
+                      color: secondaryText,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      // sera branché plus tard (favoris Firestore)
+                    },
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 4),
 
-              // Ligne bagage + poids disponibles (en bleu et gras)
-              Column(
+              // Villes + ligne bagage / poids AU MILIEU
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  // Départ
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item['depart_country'] ?? '',
+                          style: const TextStyle(
+                            color: kPrimaryBlue,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          item['depart_city'] ?? '',
+                          style: TextStyle(
+                            color: secondaryText,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  // Ligne bagage + poids dispo au centre
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _dot(),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Divider(
-                          color: Colors.grey.withValues(alpha: 0.4),
-                          thickness: 1,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _dot(),
+                          const SizedBox(width: 4),
+                          _segmentLine(),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.luggage,
+                            color: kPrimaryBlue,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 4),
+                          _segmentLine(),
+                          const SizedBox(width: 4),
+                          _dot(),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          text: item['weight'] ?? '',
+                          style: const TextStyle(
+                            color: kPrimaryBlue,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
+                          children: const [
+                            TextSpan(
+                              text: ' disponibles',
+                              style: TextStyle(
+                                color: kPrimaryBlue,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 6),
-                      const Icon(
-                        Icons.luggage,
-                        color: kPrimaryBlue,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Divider(
-                          color: Colors.grey.withValues(alpha: 0.4),
-                          thickness: 1,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      _dot(),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      text: item['weight'] ?? '',
-                      style: const TextStyle(
-                        color: kPrimaryBlue,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                      ),
-                      children: const [
-                        TextSpan(
-                          text: ' disponibles',
-                          style: TextStyle(
+
+                  const SizedBox(width: 8),
+
+                  // Destination
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          item['destination_country'] ?? '',
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(
                             color: kPrimaryBlue,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          item['destination_city'] ?? '',
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            color: secondaryText,
+                            fontSize: 13,
                           ),
                         ),
                       ],
@@ -621,6 +639,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  Widget _segmentLine() {
+    return Container(
+      width: 24,
+      height: 1,
+      color: Colors.grey.withValues(alpha: 0.4),
+    );
+  }
 }
 
 /// Bouton "Filtrer" / "Trier" en haut
@@ -719,9 +745,8 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final Color sheetBg = widget.isDarkMode
-        ? const Color(0xFF050816)
-        : Colors.white;
+    final Color sheetBg =
+    widget.isDarkMode ? const Color(0xFF050816) : Colors.white;
     final Color primaryText =
     widget.isDarkMode ? Colors.white : Colors.black87;
     final Color secondaryText =
@@ -745,8 +770,8 @@ class _FilterBottomSheetState extends State<_FilterBottomSheet> {
               children: [
                 // HEADER
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 12),
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   child: Row(
                     children: [
                       IconButton(
@@ -1163,7 +1188,8 @@ class _CityAutocompleteField extends StatelessWidget {
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: options.length,
-                    separatorBuilder: (context, index) => const Divider(height: 1),
+                    separatorBuilder: (context, index) =>
+                    const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final opt = options.elementAt(index);
                       return ListTile(
@@ -1200,9 +1226,8 @@ class _SortBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color sheetBg = isDarkMode
-        ? const Color(0xFF050816)
-        : Colors.white;
+    final Color sheetBg =
+    isDarkMode ? const Color(0xFF050816) : Colors.white;
     final Color primaryText =
     isDarkMode ? Colors.white : Colors.black87;
     final Color secondaryText =
@@ -1250,8 +1275,8 @@ class _SortBottomSheet extends StatelessWidget {
           children: [
             // HEADER
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 12),
+              padding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   IconButton(

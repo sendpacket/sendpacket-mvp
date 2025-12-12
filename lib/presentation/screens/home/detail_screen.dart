@@ -13,21 +13,26 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Debug console
-   // print('ITEM DÉTAIL = $item');
-
     // Lecture des champs "plats"
     final String departCity = (item['depart_city'] ?? '') as String;
-    final String departCountry = (item['depart_country'] ?? '') as String;
-    final String destinationCity = (item['destination_city'] ?? '') as String;
+    final String departCountry =
+    (item['depart_country'] ?? '') as String;
+    final String destinationCity =
+    (item['destination_city'] ?? '') as String;
     final String destinationCountry =
     (item['destination_country'] ?? '') as String;
     final String weight = (item['weight'] ?? '') as String;
-    final String departureDate = (item['departure_time'] ?? '') as String;
-    final String arrivalDate = (item['arrival_time'] ?? '') as String;
+
+    // les champs pour les dates (labels déjà formatés)
+    final String departureDate =
+    (item['departure_date_label'] ?? '') as String;
+    final String arrivalDate =
+    (item['arrival_date_label'] ?? '') as String;
+
+    // nom & prix : déjà préparés côté HomeScreen (avec fallback)
     final String carrierName = (item['carrier_name'] ?? '') as String;
     final String carrierImage = (item['carrier_image'] ?? '') as String;
-    final String price = item['price']?.toString() ?? '';
+    final String price = (item['price'] ?? '') as String;
 
     // Données "brutes" venant directement de Firestore
     final Map<String, dynamic> raw =
@@ -111,7 +116,8 @@ class DetailScreen extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            "$departCity ($departCountry) → $destinationCity ($destinationCountry)",
+                            "$departCity ($departCountry) → "
+                                "$destinationCity ($destinationCountry)",
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.bold,
@@ -292,11 +298,11 @@ class DetailScreen extends StatelessWidget {
 
   void _callNumber(String number) {
     log("Appel vers $number");
-    // TODO: intégrer url_launcher si vous voulez un vrai appel
+    // TODO: intégrer url_launcher plus tard un vrai appel
   }
 
   void _openWhatsApp(String number) {
     log("WhatsApp vers $number");
-    // TODO: intégrer url_launcher avec wa.me si vous voulez l'ouverture réelle
+    // TODO: intégrer url_launcher avec wa.me plutard
   }
 }
