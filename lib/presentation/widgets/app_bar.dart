@@ -1,8 +1,5 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
-
 import '../screens/settings/settings_screen.dart';
-import '../screens/auth/login_screen.dart';
 
 const Color kPrimaryBlue = Color(0xFF3A7FEA);
 
