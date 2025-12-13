@@ -7,6 +7,11 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../data/model/announcement_model.dart';
 
+const Color kPrimaryBlue = Color(0xFF3A7FEA);
+const Color kDarkBackground = Color(0xFF050816);
+const Color kLightBackground = Color(0xFFF7F9FC);
+const Color kDarkCard = Color(0xFF111727);
+
 class CreateAnnouncementScreen extends StatefulWidget {
   const CreateAnnouncementScreen({super.key});
 
@@ -68,18 +73,72 @@ class _CreateAnnouncementScreenState
     required ValueChanged<DateTime> onSelected,
   }) async {
     final now = DateTime.now();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     final picked = await showDatePicker(
       context: context,
       initialDate: initial ?? now,
       firstDate: DateTime(now.year, now.month, now.day),
       lastDate: DateTime(now.year + 3),
+
+      builder: (context, child) {
+        final baseTheme = Theme.of(context);
+
+        return Theme(
+          data: baseTheme.copyWith(
+            colorScheme: isDark
+                ? ColorScheme.dark(
+              primary: kPrimaryBlue,
+              onPrimary: Colors.white,
+              surface: kDarkCard,
+              onSurface: Colors.white,
+            )
+                : ColorScheme.light(
+              primary: kPrimaryBlue,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black87,
+            ),
+
+            dialogBackgroundColor:
+            isDark ? kDarkCard : Colors.white,
+
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: kPrimaryBlue,
+                textStyle: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
-    if (picked != null) onSelected(picked);
+
+    if (picked != null) {
+      onSelected(picked);
+    }
   }
 
+
+
   void _showSnack(String msg) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg)),
+      SnackBar(
+        content: Text(
+          msg,
+          style: const TextStyle(fontWeight: FontWeight.w500),
+        ),
+        backgroundColor:
+        isDark ? kDarkCard : Colors.grey.shade900,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        margin: const EdgeInsets.all(16),
+      ),
     );
   }
 
@@ -174,7 +233,11 @@ class _CreateAnnouncementScreenState
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+      builder: (_) => const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(kPrimaryBlue),
+          ),
+      ),
     );
 
     try {
@@ -265,23 +328,30 @@ class _CreateAnnouncementScreenState
 
   //Message ajout reussi
   Future<void> _showSuccessSheet() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? kDarkCard : Colors.white;
+
     await showModalBottomSheet(
       context: context,
       isDismissible: false,
       enableDrag: false,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => Padding(
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
         padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 64),
+            const Icon(Icons.check_circle, color: kPrimaryBlue, size: 64),
             const SizedBox(height: 12),
-            const Text("Annonce publiée 🎉",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
+            const Text(
+              "Annonce publiée 🎉",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
             const Text(
               "Votre annonce est maintenant visible par les utilisateurs.",
               textAlign: TextAlign.center,
@@ -289,11 +359,18 @@ class _CreateAnnouncementScreenState
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
+              height: 48,
               child: ElevatedButton(
-                child: const Text("Retour à l’accueil"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryBlue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
                 onPressed: () => Navigator.pop(context),
+                child: const Text("Retour à l’accueil"),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -345,24 +422,35 @@ class _CreateAnnouncementScreenState
   }
 
   Widget _introPage() {
-    return Padding(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? kDarkBackground : const Color(0xFFF7F9FC);
+    final cardColor = isDark ? kDarkCard : Colors.white;
+    final primaryText = isDark ? Colors.white : Colors.black87;
+    final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
+
+    return Container(
+      color: bgColor,
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
 
-          const Text(
+          Text(
             "Avant de publier une annonce",
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: primaryText,
+            ),
           ),
 
           const SizedBox(height: 12),
 
-          const Text(
+          Text(
             "Pour garantir votre sécurité et celle des autres utilisateurs, "
                 "merci de prendre connaissance des recommandations suivantes :",
-            style: TextStyle(fontSize: 15),
+            style: TextStyle(fontSize: 15, color: secondaryText),
           ),
 
           const SizedBox(height: 24),
@@ -389,9 +477,22 @@ class _CreateAnnouncementScreenState
 
           SizedBox(
             width: double.infinity,
+            height: 48,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryBlue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
               onPressed: () => setState(() => _hasStarted = true),
-              child: const Text("Commencer"),
+              child: const Text(
+                "Commencer",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],
@@ -399,37 +500,47 @@ class _CreateAnnouncementScreenState
     );
   }
 
-  Widget _adviceItem(String title, String description) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+  Widget _adviceItem(String title, String description) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? kDarkCard : Colors.white;
+    final primaryText = isDark ? Colors.white : Colors.black87;
+    final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.check_circle,
-            color: colorScheme.primary,
-          ),
-          const SizedBox(width: 10),
+          const Icon(Icons.check_circle, color: kPrimaryBlue),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: colorScheme.onSurface,
+                    color: primaryText,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   description,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withOpacity(0.85),
-                  ),
+                  style: TextStyle(color: secondaryText),
                 ),
               ],
             ),
@@ -445,8 +556,22 @@ class _CreateAnnouncementScreenState
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor:
+      isDark ? kDarkBackground : kLightBackground,
       appBar: AppBar(
+        backgroundColor: isDark ? kDarkBackground : Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Colors.black87,
+        ),
+        titleTextStyle: TextStyle(
+          color: isDark ? Colors.white : Colors.black87,
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
         title: const Text("Créer une annonce"),
       ),
       body: _hasStarted
@@ -463,41 +588,42 @@ class _CreateAnnouncementScreenState
   }
 
   Widget _stepIndicator() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
+
     final titles = ["Trajet", "Dates", "Poids", "Contact", "Résumé"];
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
-        children: List.generate(5, (i) {
+        children: List.generate(titles.length, (i) {
           final active = i == _currentStep;
           final done = i < _currentStep;
 
-          Color c = done
-              ? Colors.green
-              : (active ? Colors.blue : Colors.grey.shade300);
+          final color = active || done
+              ? kPrimaryBlue
+              : kPrimaryBlue.withOpacity(0.25);
 
           return Expanded(
             child: Column(
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
+                Container(
                   height: 4,
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
-                    color: c,
+                    color: color,
                     borderRadius: BorderRadius.circular(20),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   titles[i],
                   style: TextStyle(
                     fontSize: 11,
-                    fontWeight: active ? FontWeight.bold : FontWeight.w400,
-                    color: active
-                        ? Colors.blue
-                        : (done ? Colors.green : Colors.grey.shade600),
+                    fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                    color: active ? kPrimaryBlue : secondaryText,
                   ),
-                )
+                ),
               ],
             ),
           );
@@ -566,112 +692,261 @@ class _CreateAnnouncementScreenState
     required Function(String) onPickCountry,
     required Function(String) onPickCity,
   }) {
+    // Détection du mode dark / light
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Couleurs issues du design system
+    final cardColor = isDark ? kDarkCard : Colors.white;
+    final primaryText = isDark ? Colors.white : Colors.black87;
+    final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
+
+    // Liste des villes selon le pays sélectionné
     final list = selectedCountry == null
         ? <String>[]
         : (cities[selectedCountry] ?? []);
 
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: primaryText,
+            ),
+          ),
 
-            // COUNTRY PICKER
-            GestureDetector(
-              onTap: () {
-                showCountryPicker(
-                  context: context,
-                  showPhoneCode: false,
-                  onSelect: (Country c) => onPickCountry(c.name),
-                );
-              },
-              child: Container(
-                padding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(12),
+          const SizedBox(height: 12),
+
+          // ---------- COUNTRY PICKER ----------
+          GestureDetector(
+            onTap: () {
+              showCountryPicker(
+                context: context,
+                showPhoneCode: false,
+                countryListTheme: CountryListThemeData(
+                  backgroundColor: isDark ? kDarkBackground : Colors.white,
+                  textStyle: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  searchTextStyle: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                  inputDecoration: InputDecoration(
+                    filled: true,
+                    fillColor: isDark
+                        ? Colors.white.withOpacity(0.06)
+                        : Colors.grey.shade100,
+                    prefixIcon:
+                    const Icon(Icons.search, color: kPrimaryBlue),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        selectedCountry ?? "Sélectionner un pays",
-                        style: TextStyle(
-                          color: selectedCountry == null
-                              ? Colors.grey.shade500
-                              : Colors.black,
-                        ),
+                onSelect: (c) => onPickCountry(c.name),
+              );
+            },
+            child: Container(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? Colors.white.withOpacity(0.04)
+                    : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      selectedCountry ?? "Sélectionner un pays",
+                      style: TextStyle(
+                        color: selectedCountry == null
+                            ? secondaryText
+                            : primaryText,
                       ),
                     ),
-                    const Icon(Icons.arrow_drop_down),
-                  ],
+                  ),
+                  const Icon(Icons.expand_more, color: kPrimaryBlue),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // ---------- CITY DROPDOWN ----------
+          Theme(
+            data: Theme.of(context).copyWith(
+              canvasColor: cardColor,
+              splashColor: Colors.transparent,
+              highlightColor: kPrimaryBlue.withOpacity(0.08),
+            ),
+            child: DropdownButtonFormField<String>(
+              value: selectedCity,
+              dropdownColor: cardColor,
+              iconEnabledColor: kPrimaryBlue,
+
+              style: TextStyle(
+                color: primaryText,
+                fontWeight: FontWeight.w500,
+              ),
+
+              items: list.map((c) {
+                return DropdownMenuItem<String>(
+                  value: c,
+                  child: Text(
+                    c,
+                    style: TextStyle(color: primaryText),
+                  ),
+                );
+              }).toList(),
+
+              onChanged:
+              list.isEmpty ? null : (v) => onPickCity(v!),
+
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: isDark
+                    ? Colors.white.withOpacity(0.04)
+                    : Colors.grey.shade100,
+
+                hintText: "Ville",
+                hintStyle: TextStyle(color: secondaryText),
+
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide.none,
+                ),
+
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide:
+                  const BorderSide(color: kPrimaryBlue),
                 ),
               ),
             ),
-
-            const SizedBox(height: 12),
-
-            // CITY DROPDOWN
-            DropdownButtonFormField<String>(
-              value: selectedCity,
-              decoration: InputDecoration(
-                labelText: "Ville",
-                border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              items: list
-                  .map((city) =>
-                  DropdownMenuItem(value: city, child: Text(city)))
-                  .toList(),
-              onChanged:
-              list.isEmpty ? null : (v) => onPickCity(v.toString()),
-            ),
-          ],
-        ),
-      ),
+          ),
+        ],
+      )
     );
   }
 
+
   // --------- STEP 1 : DATES ---------
   Widget _stepDates() {
+    // Détection dark / light
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Couleurs issues du design system
+    final bgInput = isDark
+        ? Colors.white.withOpacity(0.04)
+        : Colors.grey.shade100;
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final hintColor = isDark ? Colors.white70 : Colors.grey[700];
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          // ---------- DATE DU VOYAGE ----------
           TextFormField(
+            // Champ non éditable (logique inchangée)
             readOnly: true,
+
+            // Controller reconstruit comme dans ton code original
             controller: TextEditingController(
               text: _dateVoyage == null ? "" : _formatDate(_dateVoyage!),
             ),
-            decoration: const InputDecoration(
-                labelText: "Date du voyage",
-                prefixIcon: Icon(Icons.flight_takeoff),
-                border: OutlineInputBorder()),
+
+            // Interaction identique
             onTap: () => _pickDate(
-                initial: _dateVoyage,
-                onSelected: (d) => setState(() => _dateVoyage = d)),
+              initial: _dateVoyage,
+              onSelected: (d) => setState(() => _dateVoyage = d),
+            ),
+
+            // Décoration VISUELLE uniquement
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: bgInput,
+
+              labelText: "Date du voyage",
+              labelStyle: TextStyle(color: hintColor),
+
+              prefixIcon: const Icon(
+                Icons.flight_takeoff,
+                color: kPrimaryBlue,
+              ),
+
+              // Suppression bordure Material
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+
+              // Bordure focus unique (HomeScreen)
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: kPrimaryBlue),
+              ),
+            ),
+
+            style: TextStyle(color: textColor),
           ),
+
           const SizedBox(height: 16),
+
+          // ---------- EXPIRATION DE L’ANNONCE ----------
           TextFormField(
             readOnly: true,
+
             controller: TextEditingController(
               text: _expiresAt == null ? "" : _formatDate(_expiresAt!),
             ),
-            decoration: const InputDecoration(
-                labelText: "Expiration de l’annonce",
-                prefixIcon: Icon(Icons.event_busy),
-                border: OutlineInputBorder()),
+
             onTap: () => _pickDate(
-                initial: _expiresAt,
-                onSelected: (d) => setState(() => _expiresAt = d)),
+              initial: _expiresAt,
+              onSelected: (d) => setState(() => _expiresAt = d),
+            ),
+
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: bgInput,
+
+              labelText: "Expiration de l’annonce",
+              labelStyle: TextStyle(color: hintColor),
+
+              prefixIcon: const Icon(
+                Icons.event_busy,
+                color: kPrimaryBlue,
+              ),
+
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: kPrimaryBlue),
+              ),
+            ),
+
+            style: TextStyle(color: textColor),
           ),
         ],
       ),
@@ -680,37 +955,105 @@ class _CreateAnnouncementScreenState
 
   // --------- STEP 2 : POIDS & PRIX ---------
   Widget _stepPoidsPrix() {
+    // Détection dark / light
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Couleurs issues du design system
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
+    final inputBg = isDark
+        ? Colors.white.withOpacity(0.04)
+        : Colors.grey.shade100;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Poids disponible (1–100Kg)",
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
+          // ---------- TITRE ----------
+          Text(
+            "Poids disponible (1–100Kg)",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          // ---------- VALEUR ACTUELLE ----------
           Center(
-            child: Text("${_poids.round()} Kg",
-                style:
-                const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            child: Text(
+              "${_poids.round()} Kg",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: kPrimaryBlue,
+              ),
+            ),
           ),
-          Slider(
-            min: 1,
-            max: 50,
-            divisions: 99,
-            label: "${_poids.round()} Kg",
-            value: _poids,
-            onChanged: (v) => setState(() => _poids = v),
+
+          const SizedBox(height: 8),
+
+          // ---------- SLIDER ----------
+          SliderTheme(
+            // Personnalisation VISUELLE uniquement
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: kPrimaryBlue,
+              inactiveTrackColor: kPrimaryBlue.withOpacity(0.25),
+              thumbColor: kPrimaryBlue,
+              overlayColor: kPrimaryBlue.withOpacity(0.15),
+              trackHeight: 4,
+            ),
+            child: Slider(
+              // LOGIQUE STRICTEMENT INCHANGÉE
+              min: 1,
+              max: 50,
+              divisions: 99,
+              label: "${_poids.round()} Kg",
+              value: _poids,
+              onChanged: (v) => setState(() => _poids = v),
+            ),
           ),
-          const SizedBox(height: 20),
+
+          const SizedBox(height: 24),
+
+          // ---------- PRIX ----------
           TextFormField(
             controller: _priceCtrl,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+
+            // Type clavier inchangé
+            keyboardType:
+            const TextInputType.numberWithOptions(decimal: true),
+
+            // Décoration VISUELLE alignée HomeScreen
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: inputBg,
+
               labelText: "Prix (\$/kg)",
-              prefixIcon: Icon(Icons.attach_money),
+              labelStyle: TextStyle(color: secondaryText),
+
+              prefixIcon: const Icon(
+                Icons.attach_money,
+                color: kPrimaryBlue,
+              ),
+
+              // Suppression bordure Material
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+
+              // Bordure focus unique
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: kPrimaryBlue),
+              ),
             ),
-          )
+
+            style: TextStyle(color: textColor),
+          ),
         ],
       ),
     );
@@ -718,42 +1061,121 @@ class _CreateAnnouncementScreenState
 
   // --------- STEP 3 : CONTACT ---------
   Widget _stepContact() {
+    // Détection dark / light
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Couleurs issues du design system
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
+    final inputBg = isDark
+        ? Colors.white.withOpacity(0.04)
+        : Colors.grey.shade100;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
+          // ---------- NUMÉRO DE TÉLÉPHONE ----------
           IntlPhoneField(
-            decoration: const InputDecoration(
-              labelText: "Numéro de téléphone",
-              border: OutlineInputBorder(),
-            ),
+            // LOGIQUE STRICTEMENT INCHANGÉE
             initialCountryCode: "CA",
             onChanged: (phone) {
               _fullPhoneNumber = phone.completeNumber;
             },
+
+            // Décoration VISUELLE alignée HomeScreen
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: inputBg,
+
+              labelText: "Numéro de téléphone",
+              labelStyle: TextStyle(color: secondaryText),
+
+              // Suppression bordure Material
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: kPrimaryBlue),
+              ),
+            ),
+
+            style: TextStyle(color: textColor),
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Icon(FontAwesomeIcons.whatsapp, color: Colors.green),
-              const SizedBox(width: 8),
-              const Text("WhatsApp"),
-              const Spacer(),
-              Switch(
-                value: _useWhatsapp,
-                onChanged: (v) => setState(() => _useWhatsapp = v),
-              )
-            ],
+
+          const SizedBox(height: 20),
+
+          // ---------- WHATSAPP ----------
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: inputBg,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              children: [
+                // Icône normalisée (plus de vert)
+                const Icon(
+                  FontAwesomeIcons.whatsapp,
+                  color: kPrimaryBlue,
+                  size: 20,
+                ),
+
+                const SizedBox(width: 10),
+
+                Text(
+                  "WhatsApp",
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const Spacer(),
+
+                // Switch avec couleurs dérivées de kPrimaryBlue
+                Switch(
+                  value: _useWhatsapp,
+                  activeColor: kPrimaryBlue,
+                  activeTrackColor: kPrimaryBlue.withOpacity(0.35),
+                  onChanged: (v) => setState(() => _useWhatsapp = v),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
+
+          const SizedBox(height: 20),
+
+          // ---------- DESCRIPTION ----------
           TextFormField(
             controller: _descriptionCtrl,
             maxLines: 4,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: inputBg,
+
               labelText: "Description (optionnel)",
+              labelStyle: TextStyle(color: secondaryText),
+
+              alignLabelWithHint: true,
+
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: kPrimaryBlue),
+              ),
             ),
-          )
+
+            style: TextStyle(color: textColor),
+          ),
         ],
       ),
     );
@@ -761,234 +1183,282 @@ class _CreateAnnouncementScreenState
 
   // --------- STEP 4 : RÉSUMÉ ---------
   Widget _stepResume() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ---------- Title ----------
-          const Text(
-            "Résumé de l'annonce",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+    // Détection dark / light
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Couleurs design system
+    final bgColor = isDark ? kDarkBackground : const Color(0xFFF7F9FC);
+    final cardColor = isDark ? kDarkCard : Colors.white;
+    final primaryText = isDark ? Colors.white : Colors.black87;
+    final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
+
+    return Container(
+      color: bgColor,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ---------- TITRE ----------
+            Text(
+              "Résumé de l'annonce",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: primaryText,
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
 
-          // ---------- Trajet ----------
-          const Text(
-            "Trajet",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
+            const SizedBox(height: 24),
 
-          Row(
-            children: [
-              const Icon(Icons.flight_takeoff, size: 20, color: Colors.blue),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "${_departCity ?? '—'} (${_departCountry ?? '—'})",
-                  style: const TextStyle(fontSize: 15),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              const Icon(Icons.flight_land, size: 20, color: Colors.green),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "${_arriveCity ?? '—'} (${_arriveCountry ?? '—'})",
-                  style: const TextStyle(fontSize: 15),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-          Divider(color: Colors.grey.shade300, thickness: 1),
-          const SizedBox(height: 20),
-
-          // ---------- Dates ----------
-          const Text(
-            "Dates du voyage",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          Row(
-            children: [
-              const Icon(Icons.calendar_today, size: 20, color: Colors.deepPurple),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "Départ : ${_dateVoyage == null ? '—' : _formatDate(_dateVoyage!)}",
-                  style: const TextStyle(fontSize: 15),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              const Icon(Icons.timer_off, size: 20, color: Colors.redAccent),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "Expiration : ${_expiresAt == null ? '—' : _formatDate(_expiresAt!)}",
-                  style: const TextStyle(fontSize: 15),
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-          Divider(color: Colors.grey.shade300, thickness: 1),
-          const SizedBox(height: 20),
-
-          // ---------- Détails ----------
-          const Text(
-            "Détails de l'annonce",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          Row(
-            children: [
-              const Icon(Icons.monitor_weight, size: 20, color: Colors.orange),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "Poids disponible : ${_poids.round()} Kg",
-                  style: const TextStyle(fontSize: 15),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              const Icon(Icons.attach_money, size: 20, color: Colors.green),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "Prix : ${_priceCtrl.text.isEmpty ? "—" : "${_priceCtrl.text}\$/kg"}",
-                  style: const TextStyle(fontSize: 15),
-                ),
-              ),
-            ],
-          ),
-
-          if (_descriptionCtrl.text.trim().isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // ---------- TRAJET ----------
+            _resumeCard(
+              title: "Trajet",
               children: [
-                const Icon(Icons.description, size: 20, color: Colors.grey),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _descriptionCtrl.text,
-                    style: const TextStyle(fontSize: 15),
-                  ),
+                _resumeRow(
+                  label:
+                  "${_departCity ?? '—'} (${_departCountry ?? '—'})",
+                  icon: Icons.flight_takeoff,
+                ),
+                const SizedBox(height: 8),
+                _resumeRow(
+                  label:
+                  "${_arriveCity ?? '—'} (${_arriveCountry ?? '—'})",
+                  icon: Icons.flight_land,
                 ),
               ],
             ),
-          ],
 
-          const SizedBox(height: 20),
-          Divider(color: Colors.grey.shade300, thickness: 1),
-          const SizedBox(height: 20),
+            const SizedBox(height: 20),
 
-          // ---------- Contact ----------
-          const Text(
-            "Contact",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+            // ---------- DATES ----------
+            _resumeCard(
+              title: "Dates du voyage",
+              children: [
+                _resumeRow(
+                  label:
+                  "Départ : ${_dateVoyage == null ? '—' : _formatDate(_dateVoyage!)}",
+                  icon: Icons.calendar_today,
+                ),
+                const SizedBox(height: 8),
+                _resumeRow(
+                  label:
+                  "Expiration : ${_expiresAt == null ? '—' : _formatDate(_expiresAt!)}",
+                  icon: Icons.timer_off,
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
 
-          Row(
-            children: [
-              const Icon(Icons.phone, size: 20, color: Colors.blueGrey),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  _fullPhoneNumber ?? "—",
-                  style: const TextStyle(fontSize: 15),
+            const SizedBox(height: 20),
+
+            // ---------- DÉTAILS ----------
+            _resumeCard(
+              title: "Détails de l'annonce",
+              children: [
+                _resumeRow(
+                  label: "Poids disponible : ${_poids.round()} Kg",
+                  icon: Icons.monitor_weight,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              const Icon(FontAwesomeIcons.whatsapp, size: 22, color: Colors.green),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  _useWhatsapp ? "WhatsApp activé" : "WhatsApp désactivé",
-                  style: const TextStyle(fontSize: 15),
+                const SizedBox(height: 8),
+                _resumeRow(
+                  label: _priceCtrl.text.isEmpty
+                      ? "Prix : —"
+                      : "Prix : ${_priceCtrl.text}\$/kg",
+                  icon: Icons.attach_money,
                 ),
+                if (_descriptionCtrl.text.trim().isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _resumeRow(
+                    label: _descriptionCtrl.text,
+                    icon: Icons.description,
+                  ),
+                ],
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            // ---------- CONTACT ----------
+            _resumeCard(
+              title: "Contact",
+              children: [
+                _resumeRow(
+                  label: _fullPhoneNumber ?? "—",
+                  icon: Icons.phone,
+                ),
+                const SizedBox(height: 8),
+                _resumeRow(
+                  label: _useWhatsapp
+                      ? "WhatsApp activé"
+                      : "WhatsApp désactivé",
+                  icon: FontAwesomeIcons.whatsapp,
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 32),
+
+            Text(
+              "Veuillez vérifier vos informations avant de publier.",
+              style: TextStyle(
+                fontSize: 13,
+                color: secondaryText,
               ),
-            ],
-          ),
+            ),
 
-          const SizedBox(height: 40),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
 
-          const Text(
-            "Veuillez vérifier vos informations avant de publier.",
-            style: TextStyle(fontSize: 13, color: Colors.grey),
+  // Widget utilitaire de resume
+  Widget _resumeCard({
+    required String title,
+    required List<Widget> children,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? kDarkCard : Colors.white;
+    final primaryText = isDark ? Colors.white : Colors.black87;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
-          const SizedBox(height: 20),
         ],
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: primaryText,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _resumeRow({
+    required String label,
+    required IconData icon,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white70 : Colors.grey[800];
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20, color: kPrimaryBlue),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 15,
+              color: textColor,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
 
   // --------- BOUTONS BAS ---------
   Widget _bottomButtons() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? kDarkCard : Colors.white;
+    final borderColor =
+    isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200;
+
     final isLast = _currentStep == 4;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+
+      // Surface dédiée aux actions (HomeScreen-like)
+      decoration: BoxDecoration(
+        color: bgColor,
+        border: Border(
+          top: BorderSide(color: borderColor),
+        ),
+      ),
+
       child: Row(
         children: [
+          // ---------- BOUTON RETOUR ----------
           if (_currentStep > 0)
             Expanded(
               child: OutlinedButton(
                 onPressed: _isSubmitting ? null : _previous,
-                child: const Text("Retour"),
+
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: kPrimaryBlue,
+                  side: BorderSide(
+                    color: kPrimaryBlue.withOpacity(0.6),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+
+                child: const Text(
+                  "Retour",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
               ),
             ),
+
           if (_currentStep > 0) const SizedBox(width: 12),
+
+          // ---------- BOUTON SUIVANT / PUBLIER ----------
           Expanded(
             child: ElevatedButton(
-              onPressed: _isSubmitting
-                  ? null
-                  : (isLast ? _submit : _next),
+              onPressed:
+              _isSubmitting ? null : (isLast ? _submit : _next),
+
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kPrimaryBlue,
+                disabledBackgroundColor:
+                kPrimaryBlue.withOpacity(0.4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
+
               child: _isSubmitting
                   ? const SizedBox(
-                  height: 18,
-                  width: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2))
-                  : Text(isLast ? "Publier" : "Suivant"),
+                height: 18,
+                width: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor:
+                  AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+                  : Text(
+                isLast ? "Publier" : "Suivant",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],
