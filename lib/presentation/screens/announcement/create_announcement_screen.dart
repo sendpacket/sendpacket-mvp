@@ -164,16 +164,27 @@ class _CreateAnnouncementScreenState
         }
         return true;
 
-      case 1: // DATES
+      case 1: // DATES + POIDS
+      // Validation dates
         if (_dateVoyage == null || _expiresAt == null) {
           _showSnack("Choisis les deux dates.");
           return false;
         }
 
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+
         final depart = DateTime(
-            _dateVoyage!.year, _dateVoyage!.month, _dateVoyage!.day);
+          _dateVoyage!.year,
+          _dateVoyage!.month,
+          _dateVoyage!.day,
+        );
+
         final expiration = DateTime(
-            _expiresAt!.year, _expiresAt!.month, _expiresAt!.day);
+          _expiresAt!.year,
+          _expiresAt!.month,
+          _expiresAt!.day,
+        );
 
         if (depart.isBefore(today)) {
           _showSnack("La date de départ doit être future.");
@@ -187,17 +198,17 @@ class _CreateAnnouncementScreenState
           _showSnack("Expiration ≤ date de départ.");
           return false;
         }
-        return true;
 
-      case 2: // POIDS + PRIX
+        // Validation prix
         final price = num.tryParse(_priceCtrl.text.trim());
         if (price == null || price <= 0) {
           _showSnack("Prix invalide.");
           return false;
         }
+
         return true;
 
-      case 3: // CONTACT
+      case 2: // CONTACT
         if (_fullPhoneNumber == null ||
             _fullPhoneNumber!.replaceAll(" ", "").length < 6) {
           _showSnack("Numéro de téléphone invalide.");
@@ -591,7 +602,7 @@ class _CreateAnnouncementScreenState
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
 
-    final titles = ["Trajet", "Dates", "Poids", "Contact", "Résumé"];
+    final titles = ["Trajet", "Voyage", "Contact", "Résumé"];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -637,13 +648,14 @@ class _CreateAnnouncementScreenState
     switch (_currentStep) {
       case 0:
         return _stepTrajet();
+
       case 1:
-        return _stepDates();
+        return _stepDatesPoids(); // ⬅️ NOUVEAU
+
       case 2:
-        return _stepPoidsPrix();
+        return _stepContact(); // contact + description
+
       case 3:
-        return _stepContact();
-      case 4:
       default:
         return _stepResume();
     }
@@ -847,7 +859,7 @@ class _CreateAnnouncementScreenState
   }
 
 
-  // --------- STEP 1 : DATES ---------
+  // --------- STEP  : DATES ---------
   Widget _stepDates() {
     // Détection dark / light
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -953,7 +965,7 @@ class _CreateAnnouncementScreenState
     );
   }
 
-  // --------- STEP 2 : POIDS & PRIX ---------
+  // --------- STEP : POIDS-PRIX ---------
   Widget _stepPoidsPrix() {
     // Détection dark / light
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -970,51 +982,59 @@ class _CreateAnnouncementScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ---------- TITRE ----------
-          Text(
-            "Poids disponible (1–100Kg)",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: textColor,
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: inputBg, // 👈 même gris que les autres champs
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Poids disponible (1–100Kg)",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Center(
+                  child: Text(
+                    "${_poids.round()} Kg",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: kPrimaryBlue,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: kPrimaryBlue,
+                    inactiveTrackColor: kPrimaryBlue.withOpacity(0.25),
+                    thumbColor: kPrimaryBlue,
+                    overlayColor: kPrimaryBlue.withOpacity(0.15),
+                    trackHeight: 4,
+                  ),
+                  child: Slider(
+                    min: 1,
+                    max: 100,
+                    divisions: 99,
+                    label: "${_poids.round()} Kg",
+                    value: _poids,
+                    onChanged: (v) => setState(() => _poids = v),
+                  ),
+                ),
+              ],
             ),
           ),
 
-          const SizedBox(height: 12),
-
-          // ---------- VALEUR ACTUELLE ----------
-          Center(
-            child: Text(
-              "${_poids.round()} Kg",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: kPrimaryBlue,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // ---------- SLIDER ----------
-          SliderTheme(
-            // Personnalisation VISUELLE uniquement
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: kPrimaryBlue,
-              inactiveTrackColor: kPrimaryBlue.withOpacity(0.25),
-              thumbColor: kPrimaryBlue,
-              overlayColor: kPrimaryBlue.withOpacity(0.15),
-              trackHeight: 4,
-            ),
-            child: Slider(
-              // LOGIQUE STRICTEMENT INCHANGÉE
-              min: 1,
-              max: 50,
-              divisions: 99,
-              label: "${_poids.round()} Kg",
-              value: _poids,
-              onChanged: (v) => setState(() => _poids = v),
-            ),
-          ),
 
           const SizedBox(height: 24),
 
@@ -1058,6 +1078,25 @@ class _CreateAnnouncementScreenState
       ),
     );
   }
+
+  // --------- STEP 2 : DATES + POIDS-PRIX ---------
+  Widget _stepDatesPoids() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          // ---- DATES ----
+          _stepDates(),
+
+          const SizedBox(height: 24),
+
+          // ---- POIDS & PRIX ----
+          _stepPoidsPrix(),
+        ],
+      ),
+    );
+  }
+
 
   // --------- STEP 3 : CONTACT ---------
   Widget _stepContact() {
@@ -1385,7 +1424,7 @@ class _CreateAnnouncementScreenState
     final borderColor =
     isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200;
 
-    final isLast = _currentStep == 4;
+    final isLast = _currentStep == 3;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
