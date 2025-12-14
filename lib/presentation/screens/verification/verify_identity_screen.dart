@@ -11,14 +11,15 @@ import 'package:flutter/cupertino.dart';
 import 'dart:ui';
 
 
-
 class VerifyIdentityScreen extends StatefulWidget {
   final bool isDarkMode;
+
   const VerifyIdentityScreen({super.key, required this.isDarkMode});
 
   @override
   State<VerifyIdentityScreen> createState() => _VerifyIdentityScreenState();
 }
+
 
 class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
   int currentStep = 0;
@@ -56,14 +57,13 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
     });
   }
 
-
   Future<XFile?> openCamera() async {
     final picker = ImagePicker();
     return picker.pickImage(source: ImageSource.camera);
   }
 
   void showWelcomePopup() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     showGeneralDialog(
       context: context,
@@ -90,17 +90,20 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                     child: Container(
-                      width: MediaQuery.of(context).size.width * 0.82,
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width * 0.82,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withValues(alpha:0.07)
-                            : Colors.white.withValues(alpha:0.85),
+                            ? const Color(0xFF1C1C1E).withValues(alpha: 0.75)
+                            : Colors.white.withValues(alpha: 0.95),
                         borderRadius: BorderRadius.circular(26),
                         border: Border.all(
                           color: isDark
-                              ? Colors.white.withValues(alpha:0.15)
-                              : Colors.black.withValues(alpha:0.05),
+                              ? Colors.white.withValues(alpha: 0.15)
+                              : Colors.black.withValues(alpha: 0.05),
                         ),
                       ),
                       child: Column(
@@ -116,8 +119,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                           Text(
                             "Vérification d'identité",
                             style: TextStyle(
-                              fontSize: 22,
                               fontWeight: FontWeight.w600,
+                              fontSize: 20,
                               color: isDark ? Colors.white : Colors.black,
                             ),
                             textAlign: TextAlign.center,
@@ -129,7 +132,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                             "Vos données ne seront jamais partagées.\n\n"
                                 "La vérification vous permet d'obtenir un badge qui montre aux utilisateurs que votre compte est authentique.",
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 14,
                               height: 1.45,
                               color: isDark ? Colors.white70 : Colors.black54,
                             ),
@@ -138,31 +141,34 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
                           const SizedBox(height: 26),
 
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blueAccent,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(vertical: 15),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              onPressed: () {
+                          Center(
+                            child: GestureDetector(
+                              onTap: () {
                                 Navigator.of(context).pop();
                                 setState(() => currentStep = 1);
                               },
-                              child: const Text(
-                                "Commencer",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                              child: Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: Colors.blueAccent,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.blueAccent.withValues(alpha: 0.4),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_forward_rounded,
                                   color: Colors.white,
+                                  size: 28,
                                 ),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -177,6 +183,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
   }
 
   void showMustLoginPopup() {
+    final isDark = widget.isDarkMode;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -185,14 +193,17 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
           child: Material(
             color: Colors.transparent,
             child: Container(
-              width: MediaQuery.of(dialogContext).size.width * 0.85,
+              width: MediaQuery
+                  .of(dialogContext)
+                  .size
+                  .width * 0.85,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha:0.2),
+                    color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.2),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -201,25 +212,38 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.lock_outline,
-                      size: 60, color: Colors.blueAccent),
-                  const SizedBox(height: 16),
-                  const Text(
-                    "Connexion requise",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+                  const Icon(
+                    Icons.lock_outline,
+                    size: 60,
+                    color: Colors.blueAccent,
                   ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "Vous devez être connecté pour vérifier votre identité.",
+
+                  const SizedBox(height: 16),
+
+                  Text(
+                    "Connexion requise",
                     style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black54,
-                      height: 1.4,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
                     ),
                     textAlign: TextAlign.center,
                   ),
+
+                  const SizedBox(height: 12),
+
+                  Text(
+                    "Vous devez être connecté pour vérifier votre identité.",
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 1.4,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
                   const SizedBox(height: 28),
+
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -234,8 +258,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                         Navigator.of(dialogContext).pop();
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
-                            builder: (_) =>
-                              const LoginScreen(),
+                            builder: (_) => const LoginScreen(),
                           ),
                         );
                       },
@@ -264,7 +287,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
     bool readOnly = false,
     VoidCallback? onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 18),
@@ -274,8 +297,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha:0.4)
-                : Colors.grey.withValues(alpha:0.15),
+                ? Colors.black.withValues(alpha: 0.4)
+                : Colors.grey.withValues(alpha: 0.15),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -300,13 +323,16 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
           ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 14),
+
+          filled: true,
+          fillColor: Colors.transparent,
         ),
       ),
     );
   }
 
   Widget buildPersonalInfo() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     return SingleChildScrollView(
       child: Column(
@@ -380,7 +406,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
   }
 
   void showCountryPickerBottomSheet() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     showCountryPicker(
       context: context,
@@ -400,7 +426,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
             Icons.search,
             color: isDark ? Colors.white70 : Colors.black54,
           ),
-          contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          contentPadding: const EdgeInsets.symmetric(
+              vertical: 12, horizontal: 16),
 
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
@@ -420,7 +447,10 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
           color: isDark ? Colors.white : Colors.black87,
         ),
 
-        bottomSheetHeight: MediaQuery.of(context).size.height * 0.75,
+        bottomSheetHeight: MediaQuery
+            .of(context)
+            .size
+            .height * 0.75,
       ),
 
       onSelect: (Country country) {
@@ -430,6 +460,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
   }
 
   Future<void> pickBirthDate() async {
+    final isDark = widget.isDarkMode;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -440,11 +472,11 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         return Container(
           padding: const EdgeInsets.only(top: 12, bottom: 20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha:0.1),
+                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
                 blurRadius: 20,
                 offset: const Offset(0, -5),
               ),
@@ -453,22 +485,24 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // iOS drag handle
               Container(
                 width: 40,
                 height: 5,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: isDark ? Colors.white24 : Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
+
               const SizedBox(height: 20),
 
-              const Text(
+              Text(
                 "Sélectionner votre date de naissance",
                 style: TextStyle(
-                  fontSize: 17,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: isDark ? Colors.white : Colors.black,
                 ),
               ),
 
@@ -476,14 +510,19 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
               SizedBox(
                 height: 200,
-                child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.date,
-                  maximumDate: DateTime.now(),
-                  minimumDate: DateTime(1900),
-                  initialDateTime: DateTime(1995),
-                  onDateTimeChanged: (DateTime newDate) {
-                    tempDate = newDate;
-                  },
+                child: CupertinoTheme(
+                  data: CupertinoThemeData(
+                    brightness: isDark ? Brightness.dark : Brightness.light,
+                  ),
+                  child: CupertinoDatePicker(
+                    mode: CupertinoDatePickerMode.date,
+                    maximumDate: DateTime.now(),
+                    minimumDate: DateTime(1900),
+                    initialDateTime: DateTime(1995),
+                    onDateTimeChanged: (DateTime newDate) {
+                      tempDate = newDate;
+                    },
+                  ),
                 ),
               ),
 
@@ -499,14 +538,15 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                       int age = today.year - tempDate.year;
 
                       if (today.month < tempDate.month ||
-                          (today.month == tempDate.month && today.day < tempDate.day)) {
+                          (today.month == tempDate.month &&
+                              today.day < tempDate.day)) {
                         age--;
                       }
 
                       if (age < 18) {
                         setState(() {
                           ageError = "L'âge minimal requis est 18 ans.";
-                          birthDateCtrl.text = ""; // On efface la date invalide
+                          birthDateCtrl.text = "";
                         });
                         Navigator.pop(context);
                         return;
@@ -520,7 +560,6 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
                       Navigator.pop(context);
                     },
-
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -551,7 +590,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
     required bool done,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -561,8 +600,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha:0.5)
-                : Colors.grey.withValues(alpha:0.15),
+                ? Colors.black.withValues(alpha: 0.5)
+                : Colors.grey.withValues(alpha: 0.15),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -573,7 +612,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.blueAccent.withValues(alpha:0.20),
+            color: Colors.blueAccent.withValues(alpha: 0.20),
             shape: BoxShape.circle,
           ),
           child: Icon(icon, color: Colors.blueAccent),
@@ -600,8 +639,14 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Documents d'identité",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+          Text(
+              "Documents d'identité",
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: widget.isDarkMode ? Colors.white : Colors.black
+              )
+          ),
           const SizedBox(height: 20),
 
           appleSelectField(
@@ -617,7 +662,6 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
             isFilled: selectedDocType != null,
           ),
 
-
           const SizedBox(height: 25),
 
           buildPhotoTile(
@@ -627,20 +671,30 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => KycInstructionPage(
-                    title: "Photo du document",
-                    subtitle: "Importez une photo claire de votre pièce d’identité.",
-                    icon: Icons.badge,
-                    dos: const ["Assurez vous que le document soit lisible", "Assurez vous que le document soit complet", "Assurez vous d'avoir une bonne lumière"],
-                    donts: const ["Assurez vous que le document n'ait pas de reflet", "Assurez vous que le document n'ait pas de filtre", "Assurez vous que le document ne soit pas de flou"],
-                    onImagePicked: (img) {
-                      setState(() {
-                        pickedDocument = img;
-                        documentDone = true;
-                      });
-                    },
-                    sampleImage: "assets/img/examplePics.png",
-                  ),
+                  builder: (_) =>
+                      KycInstructionPage(
+                        isDarkMode: widget.isDarkMode,
+                        title: "Photo du document",
+                        subtitle: "Importez une photo claire de votre pièce d’identité.",
+                        icon: Icons.badge,
+                        dos: const [
+                          "Assurez vous que le document soit lisible",
+                          "Assurez vous que le document soit complet",
+                          "Assurez vous d'avoir une bonne lumière"
+                        ],
+                        donts: const [
+                          "Assurez vous que le document n'ait pas de reflet",
+                          "Assurez vous que le document n'ait pas de filtre",
+                          "Assurez vous que le document ne soit pas de flou"
+                        ],
+                        onImagePicked: (img) {
+                          setState(() {
+                            pickedDocument = img;
+                            documentDone = true;
+                          });
+                        },
+                        sampleImage: "assets/img/examplePics.png",
+                      ),
                 ),
               );
             },
@@ -655,20 +709,28 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => KycInstructionPage(
-                    title: "Selfie",
-                    subtitle: "Importez un selfie bien éclairé. Veuillez suivre nos recommendations pour faciliter votre approbation",
-                    icon: Icons.person,
-                    dos: const ["Assurez vous que votre visage soit visible", "Assurez vous être dans un endroit avec une bonne lumière"],
-                    donts: const ["Assurez vous que votre selfie n'ait pas de filtres et soit réelle", "Veuillez s'il vous plait ne pas mettre de lunettes"],
-                    onImagePicked: (img) {
-                      setState(() {
-                        pickedSelfie = img;
-                        selfieDone = true;
-                      });
-                    },
-                    sampleImage: "assets/img/examplePicsSelfie.png",
-                  ),
+                  builder: (_) =>
+                      KycInstructionPage(
+                        isDarkMode: widget.isDarkMode,
+                        title: "Selfie",
+                        subtitle: "Importez un selfie bien éclairé. Veuillez suivre nos recommendations pour faciliter votre approbation",
+                        icon: Icons.person,
+                        dos: const [
+                          "Assurez vous que votre visage soit visible",
+                          "Assurez vous être dans un endroit avec une bonne lumière"
+                        ],
+                        donts: const [
+                          "Assurez vous que votre selfie n'ait pas de filtres et soit réelle",
+                          "Veuillez s'il vous plait ne pas mettre de lunettes"
+                        ],
+                        onImagePicked: (img) {
+                          setState(() {
+                            pickedSelfie = img;
+                            selfieDone = true;
+                          });
+                        },
+                        sampleImage: "assets/img/examplePicsSelfie.png",
+                      ),
                 ),
               );
             },
@@ -683,20 +745,28 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => KycInstructionPage(
-                    title: "Selfie + document",
-                    subtitle: "Photo de vous tenant votre document, soit par selfie ou comme illustré dans l'exemple ci-dessous.",
-                    icon: Icons.assignment_ind,
-                    dos: const ["Assurez vous que votre visage et votre document sont visibles", "Assurez vous que le texte de votre document soit lisible"],
-                    donts: const ["Assurez vous de ne pas mettre de photo de floue", "Assurez vous de ne rien cacher"],
-                    onImagePicked: (img) {
-                      setState(() {
-                        pickedSelfieWithDoc = img;
-                        selfieDocDone = true;
-                      });
-                    },
-                    sampleImage: "assets/img/examplePicsSelDoc.png",
-                  ),
+                  builder: (_) =>
+                      KycInstructionPage(
+                        isDarkMode: widget.isDarkMode,
+                        title: "Selfie + document",
+                        subtitle: "Photo de vous tenant votre document, soit par selfie ou comme illustré dans l'exemple ci-dessous.",
+                        icon: Icons.assignment_ind,
+                        dos: const [
+                          "Assurez vous que votre visage et votre document sont visibles",
+                          "Assurez vous que le texte de votre document soit lisible"
+                        ],
+                        donts: const [
+                          "Assurez vous de ne pas mettre de photo de floue",
+                          "Assurez vous de ne rien cacher"
+                        ],
+                        onImagePicked: (img) {
+                          setState(() {
+                            pickedSelfieWithDoc = img;
+                            selfieDocDone = true;
+                          });
+                        },
+                        sampleImage: "assets/img/examplePicsSelDoc.png",
+                      ),
                 ),
               );
             },
@@ -713,7 +783,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                     backgroundColor: Colors.blueAccent,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape:
-                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   child: const Text("Précédent",
                       style: TextStyle(color: Colors.white, fontSize: 16)),
@@ -729,7 +800,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                     backgroundColor: Colors.blueAccent,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape:
-                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   child: const Text("Soumettre",
                       style: TextStyle(color: Colors.white, fontSize: 16)),
@@ -748,7 +820,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
     required VoidCallback onTap,
     bool isFilled = false,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     return GestureDetector(
       onTap: onTap,
@@ -761,8 +833,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
           boxShadow: [
             BoxShadow(
               color: isDark
-                  ? Colors.black.withValues(alpha:0.5)
-                  : Colors.grey.withValues(alpha:0.15),
+                  ? Colors.black.withValues(alpha: 0.5)
+                  : Colors.grey.withValues(alpha: 0.15),
               blurRadius: 7,
               offset: const Offset(0, 3),
             ),
@@ -795,7 +867,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
   }
 
   void showDocumentTypeSelector() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     final docs = {
       "passport": "Passeport",
@@ -818,18 +890,16 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1,),
+                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
                 blurRadius: 25,
                 spreadRadius: 5,
                 offset: const Offset(0, -3),
               ),
             ],
           ),
-
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // --- Petite barre iOS
               Container(
                 width: 42,
                 height: 5,
@@ -846,7 +916,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
+                  color: isDark ? Colors.white : Colors.black,
                 ),
               ),
 
@@ -865,12 +935,14 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                     leading: Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.blueAccent.withValues(alpha:0.15),
+                        color: Colors.blueAccent.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.credit_card,
-                        color: isDark ? Colors.blueAccent.shade200 : Colors.blueAccent,
+                        color: isDark
+                            ? Colors.blueAccent.shade200
+                            : Colors.blueAccent,
                       ),
                     ),
                     title: Text(
@@ -906,7 +978,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
-        final dark = Theme.of(context).brightness == Brightness.dark;
+        final isDark = widget.isDarkMode;
 
         return Center(
           child: Material(
@@ -916,18 +988,21 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                 child: Container(
-                  width: MediaQuery.of(dialogContext).size.width * 0.85,
+                  width: MediaQuery
+                      .of(dialogContext)
+                      .size
+                      .width * 0.85,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: dark
-                        ? Colors.black.withValues(alpha:0.55)
-                        : Colors.white.withValues(alpha:0.85),
+                    color: isDark
+                        ? const Color(0xFF1C1C1E).withValues(alpha: 0.85)
+                        : Colors.white.withValues(alpha: 0.95),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: dark
-                            ? Colors.black.withValues(alpha:0.6)
-                            : Colors.black.withValues(alpha:0.15),
+                        color: Colors.black.withValues(alpha: isDark
+                            ? 0.6
+                            : 0.15),
                         blurRadius: 25,
                         offset: const Offset(0, 10),
                       ),
@@ -939,7 +1014,9 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                       Icon(
                         Icons.error_outline,
                         size: 60,
-                        color: dark ? Colors.red[300] : Colors.redAccent,
+                        color: isDark
+                            ? Colors.red.shade300
+                            : Colors.redAccent,
                       ),
 
                       const SizedBox(height: 16),
@@ -947,9 +1024,9 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                       Text(
                         "Champs manquants",
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: dark ? Colors.white : Colors.black87,
+                          color: isDark ? Colors.white : Colors.black,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -959,9 +1036,9 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                       Text(
                         "Veuillez compléter tous les champs avant de continuer.",
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           height: 1.4,
-                          color: dark ? Colors.white70 : Colors.black54,
+                          color: isDark ? Colors.white70 : Colors.black54,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -1001,6 +1078,76 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
     );
   }
 
+  void showLoadingPopup() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withValues(alpha: 0.45),
+      transitionDuration: const Duration(milliseconds: 250),
+      pageBuilder: (_, _, _) => const SizedBox(),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final scale = Tween<double>(begin: 0.95, end: 1.0).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeOut),
+        );
+
+        return Transform.scale(
+          scale: scale.value,
+          child: Opacity(
+            opacity: animation.value,
+            child: Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(26),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    width: 220,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 26,
+                      horizontal: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.black.withValues(alpha: 0.6)
+                          : Colors.white.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(26),
+                      border: Border.all(
+                        color: isDark
+                            ? Colors.white.withValues(alpha: 0.12)
+                            : Colors.black.withValues(alpha: 0.05),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.35),
+                          blurRadius: 30,
+                          offset: const Offset(0, 14),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CupertinoActivityIndicator(
+                          radius: 18,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        const SizedBox(height: 6),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> submitVerification() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -1020,6 +1167,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         return;
       }
 
+      showLoadingPopup();
+
       final storage = FirebaseStorage.instance;
 
       Future<String> uploadImage(XFile file, String name) async {
@@ -1030,7 +1179,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
       final docUrl = await uploadImage(pickedDocument!, "document");
       final selfieUrl = await uploadImage(pickedSelfie!, "selfie");
-      final selfieDocUrl = await uploadImage(pickedSelfieWithDoc!, "selfie_document");
+      final selfieDocUrl =
+      await uploadImage(pickedSelfieWithDoc!, "selfie_document");
 
       await FirebaseFirestore.instance.collection("kycRequests").add({
         "uid": uid,
@@ -1052,18 +1202,24 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         context: context,
         barrierDismissible: false,
         builder: (dialogContext) {
+          final isDark = widget.isDarkMode;
+
           return Center(
             child: Material(
               color: Colors.transparent,
               child: Container(
-                width: MediaQuery.of(dialogContext).size.width * 0.85,
+                width: MediaQuery
+                    .of(dialogContext)
+                    .size
+                    .width * 0.85,
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha:0.25),
+                      color:
+                      Colors.black.withValues(alpha: isDark ? 0.4 : 0.2),
                       blurRadius: 25,
                       offset: const Offset(0, 12),
                     ),
@@ -1072,21 +1228,33 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.verified, size: 60, color: Colors.blueAccent),
+                    const Icon(
+                      Icons.verified,
+                      size: 60,
+                      color: Colors.blueAccent,
+                    ),
+
                     const SizedBox(height: 16),
 
-                    const Text(
+                    Text(
                       "Demande envoyée !",
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black,
+                      ),
                       textAlign: TextAlign.center,
                     ),
 
                     const SizedBox(height: 12),
 
-                    const Text(
+                    Text(
                       "Votre vérification d'identité est maintenant en cours de traitement.",
-                      style:
-                      TextStyle(fontSize: 15, color: Colors.black54, height: 1.4),
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.4,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
                       textAlign: TextAlign.center,
                     ),
 
@@ -1106,7 +1274,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
                           Navigator.of(dialogContext).pop();
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
-                              builder: (_) => SettingsScreen(isDarkMode: widget.isDarkMode),
+                              builder: (_) =>
+                                  SettingsScreen(isDarkMode: widget.isDarkMode),
                             ),
                           );
                         },
@@ -1126,7 +1295,6 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
           );
         },
       );
-
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erreur : $e")),
@@ -1141,7 +1309,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
       filled: true,
       fillColor: const Color(0xFFEAF2FF),
       border:
-      OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+      OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: const BorderSide(color: Color(0xFF3A7FEA), width: 2),
@@ -1168,7 +1337,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
     required bool done,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -1178,8 +1347,8 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? Colors.black.withValues(alpha:0.5)
-                : Colors.grey.withValues(alpha:0.15),
+                ? Colors.black.withValues(alpha: 0.5)
+                : Colors.grey.withValues(alpha: 0.15),
             blurRadius: 7,
             offset: const Offset(0, 3),
           ),
@@ -1190,7 +1359,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
         leading: Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.blueAccent.withValues(alpha:0.15),
+            color: Colors.blueAccent.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -1218,16 +1387,18 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bg = widget.isDarkMode ? Colors.black : Colors.white;
+    final isDark = widget.isDarkMode;
 
     return Scaffold(
-      backgroundColor: bg,
+      backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: bg,
+        backgroundColor: isDark ? Colors.black : Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-              color: widget.isDarkMode ? Colors.white : Colors.black),
+          icon: Icon(
+            Icons.arrow_back,
+            color: isDark ? Colors.white : Colors.black,
+          ),
           onPressed: () {
             if (currentStep == 2) {
               setState(() => currentStep = 1);
@@ -1236,10 +1407,17 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
             }
           },
         ),
-        title: const Text("Vérification d'identité",
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        iconTheme:
-        IconThemeData(color: widget.isDarkMode ? Colors.white : Colors.black),
+        title: Text(
+          "Vérification d'identité",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Colors.black,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -1254,6 +1432,7 @@ class _VerifyIdentityScreenState extends State<VerifyIdentityScreen> {
 }
 
 class KycInstructionPage extends StatefulWidget {
+  final bool isDarkMode;
   final String title;
   final String subtitle;
   final IconData icon;
@@ -1265,6 +1444,7 @@ class KycInstructionPage extends StatefulWidget {
 
   const KycInstructionPage({
     super.key,
+    required this.isDarkMode,
     required this.title,
     required this.subtitle,
     required this.icon,
@@ -1300,16 +1480,24 @@ class _KycInstructionPageState extends State<KycInstructionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? Colors.black : Colors.white;
+    final isDark = widget.isDarkMode;
 
     return Scaffold(
-      backgroundColor: bg,
+      backgroundColor: isDark ? Colors.black : Colors.white,
       appBar: AppBar(
-        backgroundColor: bg,
+        backgroundColor: isDark ? Colors.black : Colors.white,
         elevation: 0,
-        title: Text(widget.title,
-            style: const TextStyle(fontWeight: FontWeight.bold)),
+        iconTheme: IconThemeData(
+          color: isDark ? Colors.white : Colors.black,
+        ),
+        title: Text(
+          widget.title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: isDark ? Colors.white : Colors.black,
+          ),
+        ),
       ),
       body: SafeArea(
         child: Padding(
@@ -1317,11 +1505,12 @@ class _KycInstructionPageState extends State<KycInstructionPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Apple Style
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.white10 : const Color(0xFFF3F4F6),
+                  color: isDark
+                      ? Colors.white10
+                      : const Color(0xFFF3F4F6),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: Row(
@@ -1331,22 +1520,24 @@ class _KycInstructionPageState extends State<KycInstructionPage> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.blueAccent.withValues(alpha:0.25)
+                            ? Colors.blueAccent.withValues(alpha: 0.25)
                             : const Color(0xFFE3F0FF),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(widget.icon,
-                          size: 32, color: Colors.blueAccent),
+                      child: Icon(
+                        widget.icon,
+                        size: 32,
+                        color: Colors.blueAccent,
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Text(
                         widget.subtitle,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           height: 1.4,
-                          color:
-                          isDark ? Colors.white70 : Colors.grey.shade800,
+                          color: isDark ? Colors.white70 : Colors.grey.shade800,
                         ),
                       ),
                     ),
@@ -1359,66 +1550,76 @@ class _KycInstructionPageState extends State<KycInstructionPage> {
               Text(
                 "Recommandations pour une bonne photo",
                 style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
               ),
               const SizedBox(height: 8),
 
-              ...widget.dos.map((e) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle,
-                        size: 18, color: Colors.green),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        e,
-                        style: TextStyle(
+              ...widget.dos.map(
+                    (e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle,
+                        size: 18,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          e,
+                          style: TextStyle(
                             fontSize: 14,
                             height: 1.35,
-                            color: isDark
-                                ? Colors.white70
-                                : Colors.grey.shade800),
+                            color: isDark ? Colors.white70 : Colors.grey.shade800,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              )),
+              ),
 
               const SizedBox(height: 18),
 
               Text(
                 "À éviter",
                 style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
               ),
               const SizedBox(height: 8),
 
-              ...widget.donts.map((e) => Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Row(
-                  children: [
-                    const Icon(Icons.cancel,
-                        size: 18, color: Colors.red),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        e,
-                        style: TextStyle(
+              ...widget.donts.map(
+                    (e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.cancel,
+                        size: 18,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          e,
+                          style: TextStyle(
                             fontSize: 14,
                             height: 1.35,
-                            color: isDark
-                                ? Colors.white70
-                                : Colors.grey.shade800),
+                            color: isDark ? Colors.white70 : Colors.grey.shade800,
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              )),
+              ),
 
               const SizedBox(height: 24),
 
@@ -1435,34 +1636,25 @@ class _KycInstructionPageState extends State<KycInstructionPage> {
 
               const SizedBox(height: 24),
 
-
               const Spacer(),
 
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: picking ? null : _pickFromGallery,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                  ),
                   child: picking
                       ? const SizedBox(
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white)),
+                      strokeWidth: 2,
+                      valueColor:
+                      AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
                   )
                       : const Text(
                     "Choisir une photo",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

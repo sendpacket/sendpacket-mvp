@@ -15,13 +15,18 @@ class FloatingBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color bg = isDarkMode
-        ? const Color(0xCC0B1220)
-        : Colors.white.withValues(alpha: 0.95);
 
-    final Color iconColor = isDarkMode ? Colors.white : Colors.black87;
-    final Color textColor =
-    isDarkMode ? Colors.white70 : Colors.grey[700]!;
+    final Color bg = isDarkMode
+        ? const Color(0xFF0B1220).withValues(alpha: 0.85)
+        : Colors.white.withValues(alpha: 0.85);
+
+    final Color iconColor = isDarkMode
+        ? Colors.white
+        : const Color(0xFF0B1220);
+
+    final Color textColor = isDarkMode
+        ? Colors.white70
+        : Colors.black54;
 
     return Align(
       alignment: Alignment.bottomCenter,
@@ -33,7 +38,7 @@ class FloatingBottomBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.35),
+              color: Colors.black.withValues(alpha: isDarkMode ? 0.3 : 0.15),
               blurRadius: 30,
               offset: const Offset(0, 18),
             ),
@@ -47,9 +52,7 @@ class FloatingBottomBar extends StatelessWidget {
               label: 'Favoris',
               iconColor: iconColor,
               textColor: textColor,
-              onTap: () {
-                // TODO: favoris page
-              },
+              onTap: () {},
             ),
             const Spacer(),
             _buildCenterButton(context),
@@ -61,13 +64,10 @@ class FloatingBottomBar extends StatelessWidget {
               iconColor: iconColor,
               textColor: textColor,
               onTap: () {
-                // Ouverture directe de l'écran de paramètres
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => SettingsScreen(
-                      isDarkMode: isDarkMode,
-                    ),
+                    builder: (_) => SettingsScreen(isDarkMode: isDarkMode),
                   ),
                 );
               },
@@ -111,11 +111,9 @@ class FloatingBottomBar extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (!isAuthenticated) {
-          // Route nommée déjà existante pour le login
           Navigator.pushNamed(context, '/login');
           return;
         }
-
         Navigator.pushNamed(context, '/create-annonce');
       },
       child: Container(
