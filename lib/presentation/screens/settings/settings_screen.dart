@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../screens/auth/login_screen.dart';
 import '../../screens/verification/verify_identity_screen.dart';
 import '../../screens/home/home_screen.dart';
+import '../../screens/profile/profile_screen.dart';
 
 
 class SettingsScreen extends StatelessWidget {
@@ -36,9 +37,16 @@ class SettingsScreen extends StatelessWidget {
           if (user != null)
             _buildMenuItem(
               icon: Icons.person,
-              label: "Modifier mon profil",
+              label: "Mon profil",
               textColor: textColor,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProfileScreen(isDarkMode: isDarkMode),
+                  ),
+                );
+              },
             ),
 
           if (user != null)

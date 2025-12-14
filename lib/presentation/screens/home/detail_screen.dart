@@ -5,29 +5,21 @@ class DetailScreen extends StatelessWidget {
   final Map<String, dynamic> item;
   final bool isDarkMode;
 
-  const DetailScreen({
-    super.key,
-    required this.item,
-    required this.isDarkMode,
-  });
+  const DetailScreen({super.key, required this.item, required this.isDarkMode});
 
   @override
   Widget build(BuildContext context) {
     // Lecture des champs "plats"
     final String departCity = (item['depart_city'] ?? '') as String;
-    final String departCountry =
-    (item['depart_country'] ?? '') as String;
-    final String destinationCity =
-    (item['destination_city'] ?? '') as String;
+    final String departCountry = (item['depart_country'] ?? '') as String;
+    final String destinationCity = (item['destination_city'] ?? '') as String;
     final String destinationCountry =
-    (item['destination_country'] ?? '') as String;
+        (item['destination_country'] ?? '') as String;
     final String weight = (item['weight'] ?? '') as String;
 
     // les champs pour les dates (labels déjà formatés)
-    final String departureDate =
-    (item['departure_date_label'] ?? '') as String;
-    final String arrivalDate =
-    (item['arrival_date_label'] ?? '') as String;
+    final String departureDate = (item['departure_date_label'] ?? '') as String;
+    final String arrivalDate = (item['arrival_date_label'] ?? '') as String;
 
     // nom & prix : déjà préparés côté HomeScreen (avec fallback)
     final String carrierName = (item['carrier_name'] ?? '') as String;
@@ -36,21 +28,22 @@ class DetailScreen extends StatelessWidget {
 
     // Données "brutes" venant directement de Firestore
     final Map<String, dynamic> raw =
-    (item['raw_data'] ?? <String, dynamic>{}) as Map<String, dynamic>;
+        (item['raw_data'] ?? <String, dynamic>{}) as Map<String, dynamic>;
 
     final String lastBookingDate = (raw['expiresAt'] ?? '') as String;
     final String description = (raw['description'] ?? '') as String;
 
     // Téléphone & WhatsApp
-    final String phone =
-    (item['raw_numero_tel'] ?? raw['numeroTel'] ?? '').toString();
+    final String phone = (item['raw_numero_tel'] ?? raw['numeroTel'] ?? '')
+        .toString();
     final bool hasWhatsApp = (raw['whatsapp'] ?? false) == true;
 
     // Couleurs selon thème
     final Color backgroundColor = isDarkMode ? Colors.black : Colors.white;
     final Color textColor = isDarkMode ? Colors.white : Colors.black87;
-    final Color subTextColor =
-    isDarkMode ? Colors.white70 : (Colors.grey[800]!);
+    final Color subTextColor = isDarkMode
+        ? Colors.white70
+        : (Colors.grey[800]!);
 
     Widget infoRow(IconData icon, String title, String subtitle) {
       return Padding(
@@ -75,10 +68,7 @@ class DetailScreen extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      color: subTextColor,
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(color: subTextColor, fontSize: 15),
                   ),
                 ],
               ),
@@ -93,10 +83,7 @@ class DetailScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: backgroundColor,
         iconTheme: IconThemeData(color: textColor),
-        title: Text(
-          "Détails",
-          style: TextStyle(color: textColor),
-        ),
+        title: Text("Détails", style: TextStyle(color: textColor)),
         elevation: 0.5,
       ),
       body: Padding(
@@ -111,13 +98,16 @@ class DetailScreen extends StatelessWidget {
                     // Villes
                     Row(
                       children: [
-                        Icon(Icons.location_on,
-                            color: Colors.redAccent, size: 28),
+                        Icon(
+                          Icons.location_on,
+                          color: Colors.redAccent,
+                          size: 28,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             "$departCity ($departCountry) → "
-                                "$destinationCity ($destinationCountry)",
+                            "$destinationCity ($destinationCountry)",
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.bold,
@@ -137,11 +127,7 @@ class DetailScreen extends StatelessWidget {
                     ),
 
                     // Arrivée
-                    infoRow(
-                      Icons.flag,
-                      "Arrivée",
-                      "Date : $arrivalDate",
-                    ),
+                    infoRow(Icons.flag, "Arrivée", "Date : $arrivalDate"),
 
                     // Dernier délai réservation (à partir de expiresAt)
                     if (lastBookingDate.isNotEmpty)
@@ -153,11 +139,7 @@ class DetailScreen extends StatelessWidget {
 
                     // Poids disponible
                     if (weight.isNotEmpty)
-                      infoRow(
-                        Icons.line_weight,
-                        "Poids disponible",
-                        weight,
-                      ),
+                      infoRow(Icons.line_weight, "Poids disponible", weight),
 
                     // Description
                     if (description.isNotEmpty)
@@ -218,9 +200,7 @@ class DetailScreen extends StatelessWidget {
                   if (phone.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                          "Numéro du transporteur non disponible.",
-                        ),
+                        content: Text("Numéro du transporteur non disponible."),
                       ),
                     );
                     return;
@@ -283,10 +263,7 @@ class DetailScreen extends StatelessWidget {
                 },
                 child: const Text(
                   "Contacter le transporteur",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
             ),
