@@ -272,6 +272,7 @@ class _CreateAnnouncementScreenState
           .get();
 
       if (existing.docs.length >= 3) {
+        if (!mounted) return;
         Navigator.of(context, rootNavigator: true).pop(); // ferme loader
         await _showLimitBottomSheet();
         return;
@@ -330,10 +331,12 @@ class _CreateAnnouncementScreenState
           .add(annonce.toMap());
 
       // ferme loader
+      if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
 
       await _showSuccessSheet();
 
+      if (!mounted) return;
       Navigator.pop(context, true);
     } catch (e) {
       Navigator.pop(context);
