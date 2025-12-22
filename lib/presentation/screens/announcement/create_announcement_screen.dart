@@ -13,7 +13,8 @@ const Color kLightBackground = Color(0xFFF7F9FC);
 const Color kDarkCard = Color(0xFF111727);
 
 class CreateAnnouncementScreen extends StatefulWidget {
-  const CreateAnnouncementScreen({super.key});
+  final bool isDarkMode;
+  const CreateAnnouncementScreen({super.key, required this.isDarkMode,});
 
   @override
   State<CreateAnnouncementScreen> createState() =>
@@ -52,10 +53,14 @@ class _CreateAnnouncementScreenState
   bool _useWhatsapp = true;
   final TextEditingController _descriptionCtrl = TextEditingController();
 
+  //Garder la valeur du numéro quand on revient sur le step
+  final TextEditingController _phoneCtrl = TextEditingController();
+
   @override
   void dispose() {
     _priceCtrl.dispose();
     _descriptionCtrl.dispose();
+    _phoneCtrl.dispose();
     super.dispose();
   }
 
@@ -73,7 +78,7 @@ class _CreateAnnouncementScreenState
     required ValueChanged<DateTime> onSelected,
   }) async {
     final now = DateTime.now();
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     final picked = await showDatePicker(
       context: context,
@@ -123,7 +128,7 @@ class _CreateAnnouncementScreenState
 
 
   void _showSnack(String msg) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -145,9 +150,6 @@ class _CreateAnnouncementScreenState
   // ========= VALIDATION PAR STEP =========
 
   bool _validateStep() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
     switch (_currentStep) {
       case 0: // TRAJET
         if (_departCountry == null ||
@@ -222,6 +224,9 @@ class _CreateAnnouncementScreenState
   }
 
   void _next() {
+    if (_currentStep == 2) {
+      _fullPhoneNumber = _phoneCtrl.text;
+    }
     if (_validateStep()) {
       setState(() => _currentStep++);
     }
@@ -339,7 +344,7 @@ class _CreateAnnouncementScreenState
 
   //Message ajout reussi
   Future<void> _showSuccessSheet() async {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
     final cardColor = isDark ? kDarkCard : Colors.white;
 
     await showModalBottomSheet(
@@ -433,9 +438,8 @@ class _CreateAnnouncementScreenState
   }
 
   Widget _introPage() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
     final bgColor = isDark ? kDarkBackground : const Color(0xFFF7F9FC);
-    final cardColor = isDark ? kDarkCard : Colors.white;
     final primaryText = isDark ? Colors.white : Colors.black87;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
 
@@ -513,7 +517,7 @@ class _CreateAnnouncementScreenState
 
 
   Widget _adviceItem(String title, String description) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
     final cardColor = isDark ? kDarkCard : Colors.white;
     final primaryText = isDark ? Colors.white : Colors.black87;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
@@ -526,7 +530,7 @@ class _CreateAnnouncementScreenState
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
@@ -567,7 +571,7 @@ class _CreateAnnouncementScreenState
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
     return Scaffold(
       backgroundColor:
       isDark ? kDarkBackground : kLightBackground,
@@ -586,12 +590,23 @@ class _CreateAnnouncementScreenState
         title: const Text("Créer une annonce"),
       ),
       body: _hasStarted
-          ? Column(
+          ? Stack(
         children: [
-          _stepIndicator(),
-          const Divider(height: 1),
-          Expanded(child: _stepBody()),
-          _bottomButtons(),
+          Column(
+            children: [
+              _stepIndicator(),
+              const Divider(height: 1),
+              Expanded(child: _stepBody()),
+            ],
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SafeArea(
+              child: _bottomButtons(),
+            ),
+          ),
         ],
       )
           : _introPage(),
@@ -599,7 +614,7 @@ class _CreateAnnouncementScreenState
   }
 
   Widget _stepIndicator() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
 
     final titles = ["Trajet", "Voyage", "Contact", "Résumé"];
@@ -613,7 +628,7 @@ class _CreateAnnouncementScreenState
 
           final color = active || done
               ? kPrimaryBlue
-              : kPrimaryBlue.withOpacity(0.25);
+              : kPrimaryBlue.withValues(alpha: 0.25);
 
           return Expanded(
             child: Column(
@@ -705,7 +720,7 @@ class _CreateAnnouncementScreenState
     required Function(String) onPickCity,
   }) {
     // Détection du mode dark / light
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
     // Couleurs issues du design system
     final cardColor = isDark ? kDarkCard : Colors.white;
     final primaryText = isDark ? Colors.white : Colors.black87;
@@ -723,7 +738,7 @@ class _CreateAnnouncementScreenState
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
@@ -759,7 +774,7 @@ class _CreateAnnouncementScreenState
                   inputDecoration: InputDecoration(
                     filled: true,
                     fillColor: isDark
-                        ? Colors.white.withOpacity(0.06)
+                        ? Colors.white.withValues(alpha: 0.06)
                         : Colors.grey.shade100,
                     prefixIcon:
                     const Icon(Icons.search, color: kPrimaryBlue),
@@ -777,7 +792,7 @@ class _CreateAnnouncementScreenState
               const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withOpacity(0.04)
+                    ? Colors.white.withValues(alpha: 0.04)
                     : Colors.grey.shade100,
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -806,10 +821,17 @@ class _CreateAnnouncementScreenState
             data: Theme.of(context).copyWith(
               canvasColor: cardColor,
               splashColor: Colors.transparent,
-              highlightColor: kPrimaryBlue.withOpacity(0.08),
+              highlightColor: kPrimaryBlue.withValues(alpha: 0.08),
             ),
             child: DropdownButtonFormField<String>(
               value: selectedCity,
+              hint: Text(
+                "Ville",
+                style: TextStyle(
+                  color: isDark ? Colors.white60 : Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
               dropdownColor: cardColor,
               iconEnabledColor: kPrimaryBlue,
 
@@ -834,11 +856,8 @@ class _CreateAnnouncementScreenState
               decoration: InputDecoration(
                 filled: true,
                 fillColor: isDark
-                    ? Colors.white.withOpacity(0.04)
+                    ? Colors.white.withValues(alpha: 0.04)
                     : Colors.grey.shade100,
-
-                hintText: "Ville",
-                hintStyle: TextStyle(color: secondaryText),
 
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -862,11 +881,11 @@ class _CreateAnnouncementScreenState
   // --------- STEP  : DATES ---------
   Widget _stepDates() {
     // Détection dark / light
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     // Couleurs issues du design system
     final bgInput = isDark
-        ? Colors.white.withOpacity(0.04)
+        ? Colors.white.withValues(alpha: 0.04)
         : Colors.grey.shade100;
     final textColor = isDark ? Colors.white : Colors.black87;
     final hintColor = isDark ? Colors.white70 : Colors.grey[700];
@@ -968,13 +987,13 @@ class _CreateAnnouncementScreenState
   // --------- STEP : POIDS-PRIX ---------
   Widget _stepPoidsPrix() {
     // Détection dark / light
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     // Couleurs issues du design system
     final textColor = isDark ? Colors.white : Colors.black87;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
     final inputBg = isDark
-        ? Colors.white.withOpacity(0.04)
+        ? Colors.white.withValues(alpha: 0.04)
         : Colors.grey.shade100;
 
     return SingleChildScrollView(
@@ -1017,9 +1036,9 @@ class _CreateAnnouncementScreenState
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     activeTrackColor: kPrimaryBlue,
-                    inactiveTrackColor: kPrimaryBlue.withOpacity(0.25),
+                    inactiveTrackColor: kPrimaryBlue.withValues(alpha: 0.25),
                     thumbColor: kPrimaryBlue,
-                    overlayColor: kPrimaryBlue.withOpacity(0.15),
+                    overlayColor: kPrimaryBlue.withValues(alpha: 0.15),
                     trackHeight: 4,
                   ),
                   child: Slider(
@@ -1101,13 +1120,13 @@ class _CreateAnnouncementScreenState
   // --------- STEP 3 : CONTACT ---------
   Widget _stepContact() {
     // Détection dark / light
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     // Couleurs issues du design system
     final textColor = isDark ? Colors.white : Colors.black87;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
     final inputBg = isDark
-        ? Colors.white.withOpacity(0.04)
+        ? Colors.white.withValues(alpha: 0.04)
         : Colors.grey.shade100;
 
     return SingleChildScrollView(
@@ -1115,8 +1134,9 @@ class _CreateAnnouncementScreenState
       child: Column(
         children: [
           // ---------- NUMÉRO DE TÉLÉPHONE ----------
+          const SizedBox(height: 16),
           IntlPhoneField(
-            // LOGIQUE STRICTEMENT INCHANGÉE
+            controller: _phoneCtrl,
             initialCountryCode: "CA",
             onChanged: (phone) {
               _fullPhoneNumber = phone.completeNumber;
@@ -1179,7 +1199,7 @@ class _CreateAnnouncementScreenState
                 Switch(
                   value: _useWhatsapp,
                   activeColor: kPrimaryBlue,
-                  activeTrackColor: kPrimaryBlue.withOpacity(0.35),
+                  activeTrackColor: kPrimaryBlue.withValues(alpha: 0.35),
                   onChanged: (v) => setState(() => _useWhatsapp = v),
                 ),
               ],
@@ -1223,7 +1243,7 @@ class _CreateAnnouncementScreenState
   // --------- STEP 4 : RÉSUMÉ ---------
   Widget _stepResume() {
     // Détection dark / light
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
 
     // Couleurs design system
     final bgColor = isDark ? kDarkBackground : const Color(0xFFF7F9FC);
@@ -1345,7 +1365,7 @@ class _CreateAnnouncementScreenState
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 140),
           ],
         ),
       ),
@@ -1357,7 +1377,7 @@ class _CreateAnnouncementScreenState
     required String title,
     required List<Widget> children,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
     final cardColor = isDark ? kDarkCard : Colors.white;
     final primaryText = isDark ? Colors.white : Colors.black87;
 
@@ -1368,7 +1388,7 @@ class _CreateAnnouncementScreenState
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
             blurRadius: 18,
             offset: const Offset(0, 10),
           ),
@@ -1395,7 +1415,7 @@ class _CreateAnnouncementScreenState
     required String label,
     required IconData icon,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
     final textColor = isDark ? Colors.white70 : Colors.grey[800];
 
     return Row(
@@ -1419,24 +1439,15 @@ class _CreateAnnouncementScreenState
 
   // --------- BOUTONS BAS ---------
   Widget _bottomButtons() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isDark = widget.isDarkMode;
     final bgColor = isDark ? kDarkCard : Colors.white;
     final borderColor =
-    isDark ? Colors.white.withOpacity(0.08) : Colors.grey.shade200;
+    isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.shade200;
 
     final isLast = _currentStep == 3;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-
-      // Surface dédiée aux actions (HomeScreen-like)
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border(
-          top: BorderSide(color: borderColor),
-        ),
-      ),
-
       child: Row(
         children: [
           // ---------- BOUTON RETOUR ----------
@@ -1448,7 +1459,7 @@ class _CreateAnnouncementScreenState
                 style: OutlinedButton.styleFrom(
                   foregroundColor: kPrimaryBlue,
                   side: BorderSide(
-                    color: kPrimaryBlue.withOpacity(0.6),
+                    color: kPrimaryBlue.withValues(alpha: 0.6),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -1474,7 +1485,7 @@ class _CreateAnnouncementScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: kPrimaryBlue,
                 disabledBackgroundColor:
-                kPrimaryBlue.withOpacity(0.4),
+                kPrimaryBlue.withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),

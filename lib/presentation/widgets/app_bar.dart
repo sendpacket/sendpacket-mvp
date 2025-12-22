@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sendpacket/presentation/screens/auth/login_screen.dart';
+import '../routes/app_routes.dart';
+import '../screens/announcement/create_announcement_screen.dart';
 import '../screens/settings/settings_screen.dart';
 
 const Color kPrimaryBlue = Color(0xFF3A7FEA);
@@ -111,10 +114,22 @@ class FloatingBottomBar extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (!isAuthenticated) {
-          Navigator.pushNamed(context, '/login');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => LoginScreen(),
+            ),
+          );
           return;
         }
-        Navigator.pushNamed(context, '/create-annonce');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => CreateAnnouncementScreen(
+              isDarkMode: isDarkMode, // 🔑 clé ici
+            ),
+          ),
+        );
       },
       child: Container(
         width: 64,
