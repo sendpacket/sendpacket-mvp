@@ -105,8 +105,9 @@ class _CreateAnnouncementScreenState
               onSurface: Colors.black87,
             ),
 
-            dialogBackgroundColor:
-            isDark ? kDarkCard : Colors.white,
+            dialogTheme: DialogThemeData(
+              backgroundColor: isDark ? kDarkCard : Colors.white,
+            ),
 
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
@@ -824,7 +825,7 @@ class _CreateAnnouncementScreenState
               highlightColor: kPrimaryBlue.withValues(alpha: 0.08),
             ),
             child: DropdownButtonFormField<String>(
-              value: selectedCity,
+              initialValue: selectedCity,
               hint: Text(
                 "Ville",
                 style: TextStyle(
@@ -1198,7 +1199,7 @@ class _CreateAnnouncementScreenState
                 // Switch avec couleurs dérivées de kPrimaryBlue
                 Switch(
                   value: _useWhatsapp,
-                  activeColor: kPrimaryBlue,
+                  activeThumbColor: kPrimaryBlue,
                   activeTrackColor: kPrimaryBlue.withValues(alpha: 0.35),
                   onChanged: (v) => setState(() => _useWhatsapp = v),
                 ),
@@ -1247,7 +1248,6 @@ class _CreateAnnouncementScreenState
 
     // Couleurs design system
     final bgColor = isDark ? kDarkBackground : const Color(0xFFF7F9FC);
-    final cardColor = isDark ? kDarkCard : Colors.white;
     final primaryText = isDark ? Colors.white : Colors.black87;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
 
@@ -1439,11 +1439,6 @@ class _CreateAnnouncementScreenState
 
   // --------- BOUTONS BAS ---------
   Widget _bottomButtons() {
-    final isDark = widget.isDarkMode;
-    final bgColor = isDark ? kDarkCard : Colors.white;
-    final borderColor =
-    isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.shade200;
-
     final isLast = _currentStep == 3;
 
     return Container(
