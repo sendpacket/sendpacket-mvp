@@ -125,7 +125,7 @@ class FloatingBottomBar extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (_) => CreateAnnouncementScreen(
-              isDarkMode: isDarkMode, // 🔑 clé ici
+              isDarkMode: isDarkMode,
             ),
           ),
         );

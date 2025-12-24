@@ -245,8 +245,6 @@ class _CreateAnnouncementScreenState
     if (!_validateStep()) return;
 
     setState(() => _isSubmitting = true);
-
-    // Loader modal
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -265,7 +263,6 @@ class _CreateAnnouncementScreenState
         return;
       }
 
-      // Limite de 3 annonces
       final existing = await FirebaseFirestore.instance
           .collection("AnnonceCollection")
           .where("ownerId", isEqualTo: user.uid)
@@ -273,38 +270,18 @@ class _CreateAnnouncementScreenState
 
       if (existing.docs.length >= 3) {
         if (!mounted) return;
-        Navigator.of(context, rootNavigator: true).pop(); // ferme loader
+        Navigator.of(context, rootNavigator: true).pop();
         await _showLimitBottomSheet();
         return;
       }
 
-      // formattage dates
+
       final now = DateTime.now();
       final todayStr = _formatDate(now);
       final dateVoyageStr = _formatDate(_dateVoyage!);
       final expiresStr = _formatDate(_expiresAt!);
 
-      // récupération infos user
-      String? firstName;
-      String? lastName;
-      String? image;
-
-      try {
-        final u = await FirebaseFirestore.instance
-            .collection("users")
-            .doc(user.uid)
-            .get();
-
-        final d = u.data();
-        if (d != null) {
-          firstName = d['firstName']?.toString();
-          lastName = d['lastName']?.toString();
-          image = d['profileImage']?.toString();
-        }
-      } catch (_) {}
-
       final annonce = Announcement(
-        id: DateTime.now().millisecondsSinceEpoch,
         departPays: _departCountry!,
         departVille: _departCity!,
         arriveePays: _arriveCountry!,
@@ -321,16 +298,12 @@ class _CreateAnnouncementScreenState
         ownerId: user.uid,
         description:
         _descriptionCtrl.text.trim().isEmpty ? null : _descriptionCtrl.text,
-        ownerFirstName: firstName,
-        ownerLastName: lastName,
-        ownerProfileImage: image,
       );
 
       await FirebaseFirestore.instance
           .collection("AnnonceCollection")
           .add(annonce.toMap());
 
-      // ferme loader
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -346,7 +319,7 @@ class _CreateAnnouncementScreenState
     }
   }
 
-  //Message ajout reussi
+  //Success
   Future<void> _showSuccessSheet() async {
     final isDark = widget.isDarkMode;
     final cardColor = isDark ? kDarkCard : Colors.white;
@@ -669,10 +642,10 @@ class _CreateAnnouncementScreenState
         return _stepTrajet();
 
       case 1:
-        return _stepDatesPoids(); // ⬅️ NOUVEAU
+        return _stepDatesPoids();
 
       case 2:
-        return _stepContact(); // contact + description
+        return _stepContact();
 
       case 3:
       default:
@@ -884,10 +857,7 @@ class _CreateAnnouncementScreenState
 
   // --------- STEP  : DATES ---------
   Widget _stepDates() {
-    // Détection dark / light
     final isDark = widget.isDarkMode;
-
-    // Couleurs issues du design system
     final bgInput = isDark
         ? Colors.white.withValues(alpha: 0.04)
         : Colors.grey.shade100;
@@ -900,21 +870,16 @@ class _CreateAnnouncementScreenState
         children: [
           // ---------- DATE DU VOYAGE ----------
           TextFormField(
-            // Champ non éditable (logique inchangée)
             readOnly: true,
-
-            // Controller reconstruit comme dans ton code original
             controller: TextEditingController(
               text: _dateVoyage == null ? "" : _formatDate(_dateVoyage!),
             ),
 
-            // Interaction identique
             onTap: () => _pickDate(
               initial: _dateVoyage,
               onSelected: (d) => setState(() => _dateVoyage = d),
             ),
 
-            // Décoration VISUELLE uniquement
             decoration: InputDecoration(
               filled: true,
               fillColor: bgInput,
@@ -927,13 +892,11 @@ class _CreateAnnouncementScreenState
                 color: kPrimaryBlue,
               ),
 
-              // Suppression bordure Material
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
               ),
 
-              // Bordure focus unique (HomeScreen)
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: const BorderSide(color: kPrimaryBlue),
@@ -990,10 +953,7 @@ class _CreateAnnouncementScreenState
 
   // --------- STEP : POIDS-PRIX ---------
   Widget _stepPoidsPrix() {
-    // Détection dark / light
     final isDark = widget.isDarkMode;
-
-    // Couleurs issues du design system
     final textColor = isDark ? Colors.white : Colors.black87;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
     final inputBg = isDark
@@ -1008,7 +968,7 @@ class _CreateAnnouncementScreenState
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: inputBg, // 👈 même gris que les autres champs
+              color: inputBg,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
@@ -1064,12 +1024,9 @@ class _CreateAnnouncementScreenState
           // ---------- PRIX ----------
           TextFormField(
             controller: _priceCtrl,
-
-            // Type clavier inchangé
             keyboardType:
             const TextInputType.numberWithOptions(decimal: true),
 
-            // Décoration VISUELLE alignée HomeScreen
             decoration: InputDecoration(
               filled: true,
               fillColor: inputBg,
@@ -1082,13 +1039,11 @@ class _CreateAnnouncementScreenState
                 color: kPrimaryBlue,
               ),
 
-              // Suppression bordure Material
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
               ),
 
-              // Bordure focus unique
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: const BorderSide(color: kPrimaryBlue),
@@ -1123,10 +1078,8 @@ class _CreateAnnouncementScreenState
 
   // --------- STEP 3 : CONTACT ---------
   Widget _stepContact() {
-    // Détection dark / light
     final isDark = widget.isDarkMode;
 
-    // Couleurs issues du design system
     final textColor = isDark ? Colors.white : Colors.black87;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
     final inputBg = isDark
@@ -1146,7 +1099,6 @@ class _CreateAnnouncementScreenState
               _fullPhoneNumber = phone.completeNumber;
             },
 
-            // Décoration VISUELLE alignée HomeScreen
             decoration: InputDecoration(
               filled: true,
               fillColor: inputBg,
@@ -1154,7 +1106,6 @@ class _CreateAnnouncementScreenState
               labelText: "Numéro de téléphone",
               labelStyle: TextStyle(color: secondaryText),
 
-              // Suppression bordure Material
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -1180,7 +1131,6 @@ class _CreateAnnouncementScreenState
             ),
             child: Row(
               children: [
-                // Icône normalisée (plus de vert)
                 const Icon(
                   FontAwesomeIcons.whatsapp,
                   color: kPrimaryBlue,
@@ -1199,7 +1149,6 @@ class _CreateAnnouncementScreenState
 
                 const Spacer(),
 
-                // Switch avec couleurs dérivées de kPrimaryBlue
                 Switch(
                   value: _useWhatsapp,
                   activeThumbColor: kPrimaryBlue,
@@ -1246,10 +1195,7 @@ class _CreateAnnouncementScreenState
 
   // --------- STEP 4 : RÉSUMÉ ---------
   Widget _stepResume() {
-    // Détection dark / light
     final isDark = widget.isDarkMode;
-
-    // Couleurs design system
     final bgColor = isDark ? kDarkBackground : const Color(0xFFF7F9FC);
     final primaryText = isDark ? Colors.white : Colors.black87;
     final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
