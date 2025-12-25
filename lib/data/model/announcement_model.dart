@@ -6,9 +6,9 @@ class Announcement {
   final String departVille;
   final String arriveePays;
   final String arriveeVille;
-  final String createdAt; // "dd-MM-yyyy"
-  final String dateVoyage; // "dd-MM-yyyy"
-  final String expiresAt; // "dd-MM-yyyy"
+  final String createdAt;
+  final String dateVoyage;
+  final String expiresAt;
   final String numeroTel;
   final int poidsDisponible;
   final num pricePerKilo;
@@ -46,7 +46,7 @@ class Announcement {
       'expiresAt': expiresAt,
       'numeroTel': numeroTel,
       'poidsDisponible': poidsDisponible,
-      'price': pricePerKilo, //
+      'price': pricePerKilo,
       'whatsapp': whatsapp,
       'isBoosted': isBoosted,
       'ownerId': ownerId,
@@ -57,26 +57,44 @@ class Announcement {
   factory Announcement.fromSnapshot(
       DocumentSnapshot<Map<String, dynamic>> snap,
       ) {
-    final data = snap.data() ?? {};
+    final data = snap.data();
+    if (data == null) {
+      throw StateError('Announcement snapshot data is null');
+    }
+
+    final poids = int.tryParse(data['poidsDisponible']?.toString() ?? '');
+    final price = num.tryParse(data['price']?.toString() ?? '');
+
+    if (poids == null || poids <= 0) {
+      throw StateError('Invalid poidsDisponible in Announcement ${snap.id}');
+    }
+
+    if (price == null || price <= 0) {
+      throw StateError('Invalid pricePerKilo in Announcement ${snap.id}');
+    }
+
+    final ownerId = data['ownerId']?.toString();
+    if (ownerId == null || ownerId.isEmpty) {
+      throw StateError('Missing ownerId in Announcement ${snap.id}');
+    }
+
     return Announcement(
       docId: snap.id,
-      departPays: (data['departPays'] ?? '').toString(),
-      departVille: (data['departVille'] ?? '').toString(),
-      arriveePays: (data['arriveePays'] ?? '').toString(),
-      arriveeVille: (data['arriveeVille'] ?? '').toString(),
-      createdAt: (data['createdAt'] ?? '').toString(),
-      dateVoyage: (data['dateVoyage'] ?? '').toString(),
-      expiresAt: (data['expiresAt'] ?? '').toString(),
-      numeroTel: (data['numeroTel'] ?? '').toString(),
-      poidsDisponible: int.tryParse(
-          (data['poidsDisponible'] ?? '0').toString()) ??
-          0,
-      pricePerKilo:
-      num.tryParse((data['price'] ?? '0').toString()) ?? 0,
-      whatsapp: (data['whatsapp'] ?? false) == true,
-      isBoosted: (data['isBoosted'] ?? false) == true,
-      ownerId: (data['ownerId'] ?? '').toString(),
-      description: (data['description'] ?? '').toString(),
+      departPays: data['departPays']?.toString() ?? '',
+      departVille: data['departVille']?.toString() ?? '',
+      arriveePays: data['arriveePays']?.toString() ?? '',
+      arriveeVille: data['arriveeVille']?.toString() ?? '',
+      createdAt: data['createdAt']?.toString() ?? '',
+      dateVoyage: data['dateVoyage']?.toString() ?? '',
+      expiresAt: data['expiresAt']?.toString() ?? '',
+      numeroTel: data['numeroTel']?.toString() ?? '',
+      poidsDisponible: poids,
+      pricePerKilo: price,
+      whatsapp: data['whatsapp'] == true,
+      isBoosted: data['isBoosted'] == true,
+      ownerId: ownerId,
+      description: data['description']?.toString(),
     );
   }
+
 }
