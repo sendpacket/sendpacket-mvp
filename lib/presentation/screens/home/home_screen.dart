@@ -91,9 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (ownerFirstName.isNotEmpty || ownerLastName.isNotEmpty) {
       // "prenom nom" (gère aussi si un seul des deux est présent)
       carrierName = ('$ownerFirstName $ownerLastName').trim();
-    } else if (description.isNotEmpty) {
-      // fallback : description des anciennes annonces
-      carrierName = description;
     } else {
       carrierName = 'Transporteur';
     }

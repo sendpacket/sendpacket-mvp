@@ -33,7 +33,6 @@ class _CreateAnnouncementScreenState
   String? _arriveCountry;
   String? _arriveCity;
 
-  // villes disponibles par pays (modifiable)
   final Map<String, List<String>> cities = {
     "Canada": ["Montréal", "Toronto", "Vancouver"],
     "Senegal": ["Dakar", "Thiès", "Saint-Louis"],
@@ -47,13 +46,9 @@ class _CreateAnnouncementScreenState
   // -------- POIDS & PRIX --------
   double _poids = 10;
   final TextEditingController _priceCtrl = TextEditingController();
-
-  // -------- CONTACT --------
   String? _fullPhoneNumber;
   bool _useWhatsapp = true;
   final TextEditingController _descriptionCtrl = TextEditingController();
-
-  //Garder la valeur du numéro quand on revient sur le step
   final TextEditingController _phoneCtrl = TextEditingController();
 
   @override
