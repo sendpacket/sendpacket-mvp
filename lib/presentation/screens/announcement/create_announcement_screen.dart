@@ -57,7 +57,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
     super.dispose();
   }
 
-  // ========= THEME HELPERS (refactor only) =========
+  // ========= THEME HELPERS =========
 
   bool get _isDark => widget.isDarkMode;
 
@@ -1147,8 +1147,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
   }
 }
 
-// ---- refactor-only: widget extrait sans logique métier ----
-// Note: contenu inchangé, juste isolé pour alléger le fichier visuellement.
 class _LimitSheetContent extends StatelessWidget {
   const _LimitSheetContent();
 

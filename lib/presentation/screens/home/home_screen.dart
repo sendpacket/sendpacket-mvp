@@ -84,8 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
     (data['ownerFirstName'] ?? '').toString().trim();
     final String ownerLastName =
     (data['ownerLastName'] ?? '').toString().trim();
-    final String description =
-    (data['description'] ?? '').toString().trim();
 
     String carrierName;
     if (ownerFirstName.isNotEmpty || ownerLastName.isNotEmpty) {
