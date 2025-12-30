@@ -364,14 +364,15 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
           children: [
             const Icon(Icons.check_circle, color: kPrimaryBlue, size: 64),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               "Annonce publiée 🎉",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: _primaryText),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               "Votre annonce est maintenant visible par les utilisateurs.",
               textAlign: TextAlign.center,
+              style: TextStyle(color: _secondaryText),
             ),
             const SizedBox(height: 20),
             SizedBox(
@@ -399,15 +400,18 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
       context: context,
       isDismissible: false,
       enableDrag: false,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => const Padding(
-        padding: EdgeInsets.all(24),
-        child: _LimitSheetContent(),
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: _card,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: _LimitSheetContent(isDark: _isDark),
       ),
     );
   }
+
 
   // ========= INTRO =========
 
@@ -1148,34 +1152,54 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
 }
 
 class _LimitSheetContent extends StatelessWidget {
-  const _LimitSheetContent();
+  final bool isDark;
+  const _LimitSheetContent({required this.isDark});
 
   @override
   Widget build(BuildContext context) {
+    final primaryText = isDark ? Colors.white : Colors.black87;
+    final secondaryText = isDark ? Colors.white70 : Colors.grey[700];
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 64),
+        const Icon(
+          Icons.warning_amber_rounded,
+          color: Colors.orange,
+          size: 64,
+        ),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           "Limite atteinte",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: primaryText,
+          ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           "Vous avez déjà 3 annonces actives.\n"
               "Veuillez supprimer une annonce existante avant d’en publier une nouvelle.",
           textAlign: TextAlign.center,
+          style: TextStyle(color: secondaryText),
         ),
         const SizedBox(height: 20),
         SizedBox(
           width: double.infinity,
+          height: 48,
           child: ElevatedButton(
-            child: const Text("Retour à la liste"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimaryBlue,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
             onPressed: () {
-              Navigator.pop(context); // ferme bottom sheet
-              Navigator.pop(context); // retour HomeScreen
+              Navigator.pop(context);
+              Navigator.pop(context);
             },
+            child: const Text("Retour à la liste"),
           ),
         ),
       ],
