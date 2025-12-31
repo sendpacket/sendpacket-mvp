@@ -129,7 +129,6 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
   Future<void> _pickDate({
     required DateTime? initial,
     required ValueChanged<DateTime> onSelected,
-    DateTime? maxDate,
   }) async {
     final now = DateTime.now();
 
@@ -137,7 +136,7 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
       context: context,
       initialDate: initial ?? now,
       firstDate: DateTime(now.year, now.month, now.day),
-      lastDate: maxDate ?? DateTime(now.year + 3),
+      lastDate: DateTime(now.year + 3),
       builder: (context, child) {
         final baseTheme = Theme.of(context);
 
@@ -232,8 +231,8 @@ class _CreateAnnouncementScreenState extends State<CreateAnnouncementScreen> {
           return false;
         }
 
-        if (!expiration.isBefore(depart)) {
-          _showSnack("La date d’expiration doit être avant la date du voyage.");
+        if (expiration.isAfter(depart)) {
+          _showSnack("La date d’expiration doit être antérieure ou égale à la date du voyage.");
           return false;
         }
 
