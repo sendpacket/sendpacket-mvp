@@ -4,6 +4,7 @@ import '../../screens/auth/login_screen.dart';
 import '../../screens/verification/verify_identity_screen.dart';
 import '../../screens/home/home_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../announcement/my_announcements_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final bool isDarkMode;
@@ -111,7 +112,14 @@ class SettingsScreen extends StatelessWidget {
               label: "Mes annonces",
               textColor: textColor,
               iconColor: iconColor,
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => MyAnnouncementsScreen(isDarkMode: isDarkMode),
+                  ),
+                );
+              },
             ),
 
           if (user != null)
